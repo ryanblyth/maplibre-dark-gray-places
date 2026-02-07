@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Generated files (rebuilt from source)
+style.json
+style.generated.json
+map-config.js
+map.js
+
+# Build artifacts
+*.log
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+
+# Temporary files
+*.tmp
+.cache/
