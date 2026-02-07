@@ -32,7 +32,7 @@ export function createMyCustomMapFixedStyle(config: BaseStyleConfig = defaultCon
   // Use basemap-specific sprite path
   const basemapConfig: BaseStyleConfig = {
     ...config,
-    spritePath: 'basemaps/my-custom-map-fixed/sprites/basemap',
+    spritePath: 'sprites/basemap',
   };
   return createBasemapStyle(myCustomMapFixedTheme, basemapConfig);
 }

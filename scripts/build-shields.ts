@@ -13,6 +13,11 @@
 import { readFileSync, writeFileSync, existsSync, renameSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import sharp from 'sharp';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Get basemap name from command line argument
 const basemapName = "my-custom-map-fixed"; // Fixed for this spinoff

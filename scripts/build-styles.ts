@@ -19,6 +19,7 @@ const productionConfig: BaseStyleConfig = {
   glyphsBaseUrl: "https://data.storypath.studio",
   glyphsPath: "glyphs",
   spriteBaseUrl: "http://localhost:8080",
+  spritePath: "sprites/basemap",
   dataBaseUrl: "https://data.storypath.studio",
 };
 
@@ -27,6 +28,7 @@ const localConfig: BaseStyleConfig = {
   glyphsBaseUrl: "https://data.storypath.studio",
   glyphsPath: "glyphs",
   spriteBaseUrl: "http://localhost:8080",
+  spritePath: "sprites/basemap",
   dataBaseUrl: "https://data.storypath.studio",
 };
 
