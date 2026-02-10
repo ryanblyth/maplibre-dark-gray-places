@@ -6,8 +6,10 @@
   "scripts": {
     "build:styles": "tsx scripts/build-styles.ts",
     "build:shields": "tsx scripts/build-shields.ts",
+    "build:utils": "tsc --project tsconfig.browser.json",
+    "build": "npm run build:utils && npm run build:styles",
     "serve": "node serve.js",
-    "dev": "npm run build:styles && npm run serve"
+    "dev": "npm run build && npm run serve"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

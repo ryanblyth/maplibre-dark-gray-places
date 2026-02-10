@@ -45,6 +45,91 @@
       z-index: 2; 
       pointer-events: none; 
     }
+    
+    /* Places popup styling */
+    .maplibregl-popup-content {
+      background: #2a2a2a;
+      color: #e0e0e0;
+      padding: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+    
+    .maplibregl-popup-close-button {
+      color: #e0e0e0;
+      font-size: 18px;
+      padding: 4px 8px;
+    }
+    
+    .maplibregl-popup-close-button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .maplibregl-popup-tip {
+      border-top-color: #2a2a2a;
+    }
+    
+    .places-popup-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #ffffff;
+      border-bottom: 1px solid #444;
+      padding-bottom: 4px;
+    }
+    
+    .places-popup-geoid {
+      font-size: 11px;
+      color: #9a9a9a;
+      margin-bottom: 8px;
+      font-family: monospace;
+    }
+    
+    .places-popup-attrs {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 4px 12px;
+      font-size: 12px;
+    }
+    
+    .places-popup-key {
+      color: #9a9a9a;
+      text-align: right;
+      white-space: nowrap;
+    }
+    
+    .places-popup-value {
+      color: #e0e0e0;
+      font-weight: 500;
+    }
+    
+    .places-popup-no-data {
+      color: #9a9a9a;
+      font-style: italic;
+      font-size: 12px;
+      padding: 8px 0;
+    }
+    
+    /* Custom scrollbar for popup */
+    .maplibregl-popup-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .maplibregl-popup-content::-webkit-scrollbar-track {
+      background: #1a1a1a;
+      border-radius: 4px;
+    }
+    
+    .maplibregl-popup-content::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+    
+    .maplibregl-popup-content::-webkit-scrollbar-thumb:hover {
+      background: #666;
+    }
   </style>
 </head>
 <body>
@@ -55,7 +140,7 @@
   <script src="https://unpkg.com/pmtiles@4.3.0/dist/pmtiles.js"></script>
   <script src="https://data.storypath.studio/js/maplibre-gl-starfield.js"></script>
   <script src="./map-config.js"></script>
-  <script src="./map.js?v=30"></script>
+  <script type="module" src="./map.js?v=31"></script>
 </body>
 </html>
 
