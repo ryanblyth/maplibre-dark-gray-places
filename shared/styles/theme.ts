@@ -770,6 +770,47 @@ export interface Theme {
   aeroway?: ThemeAeroway;
   /** Starfield configuration - optional, for globe projection background */
   starfield?: ThemeStarfield;
+  /** Places configuration - optional, for incorporated places boundaries */
+  places?: ThemePlaces;
+}
+
+// ============================================================================
+// PLACES CONFIGURATION
+// ============================================================================
+
+/** Configuration for places data layer (boundaries of incorporated places) */
+export interface ThemePlaces {
+  /** Whether to show places layer at all */
+  enabled: boolean;
+  /** Minimum zoom level to show places */
+  minZoom: number;
+  /** Fill styling for place boundaries */
+  fill: {
+    /** Fill color */
+    color: string;
+    /** Base fill opacity (can be enhanced by data-driven styling) */
+    opacity: number;
+  };
+  /** Outline styling for place boundaries */
+  outline: {
+    /** Outline color */
+    color: string;
+    /** Outline width at different zoom levels */
+    width: { z5: number; z10: number; z15: number };
+    /** Outline opacity */
+    opacity: number;
+  };
+  /** Interactivity configuration for click popups and hover effects */
+  interactivity?: {
+    /** Whether to enable click popups and interactivity */
+    enabled: boolean;
+    /** Array of state FIPS codes to pre-load (overrides auto-detection) */
+    preloadStates?: string[];
+    /** Auto-detect visible states from viewport (default: true) */
+    autoDetectStates?: boolean;
+    /** CSS max-height for popup content (enables scrolling for long attribute lists) */
+    popupMaxHeight?: string;
+  };
 }
 
 // ============================================================================

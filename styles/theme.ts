@@ -17,8 +17,9 @@ import {
   type ThemeOpacities,
   type ThemePOIs,
   type ThemeSettings,
-  type ThemeLabelFonts
-} from "../shared/styles/theme.js";
+  type ThemeLabelFonts,
+  type ThemePlaces
+} from "../shared/styles/index.js";
 
 // ============================================================================
 // SETTINGS
@@ -850,6 +851,34 @@ export const myCustomMapFixedWater = {
 };
 
 // ============================================================================
+// PLACES CONFIGURATION
+// ============================================================================
+
+export const myCustomMapFixedPlaces: ThemePlaces = {
+  /** Whether to show places layer at all */
+  enabled: true,
+  /** Minimum zoom level to show places */
+  minZoom: 5,
+  /** Fill styling for place boundaries */
+  fill: {
+    color: "#6a7588",  // Medium gray to match theme
+    opacity: 0.15,     // Base opacity, will be enhanced by population
+  },
+  /** Outline styling for place boundaries */
+  outline: {
+    color: "#8a9598",  // Lighter gray for borders
+    width: { z5: 0.5, z10: 1.0, z15: 1.5 },
+    opacity: 0.6,
+  },
+  /** Interactivity configuration */
+  interactivity: {
+    enabled: true,
+    autoDetectStates: true,
+    popupMaxHeight: "400px",
+  },
+};
+
+// ============================================================================
 // AEROWAY CONFIGURATION
 // ============================================================================
 
@@ -925,5 +954,6 @@ export const myCustomMapFixedTheme: Theme = {
   landuse: myCustomMapFixedLanduse,
   water: myCustomMapFixedWater,
   aeroway: myCustomMapFixedAeroway,
+  places: myCustomMapFixedPlaces,
   starfield: myCustomMapFixedStarfield,
 };

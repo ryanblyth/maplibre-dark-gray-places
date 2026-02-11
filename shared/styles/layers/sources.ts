@@ -99,6 +99,18 @@ export function createBasemapSources(config: BaseStyleConfig, theme?: Theme): Re
     };
   }
   
+  // Only add places source if enabled in theme
+  if (theme?.places?.enabled) {
+    sources["places-source"] = {
+      type: "vector",
+      url: "pmtiles://https://data.storypath.studio/pmtiles/places/places_cb_2024_500k_z5.pmtiles",
+      promoteId: "GEOID",
+      minzoom: 5,
+      // Note: PMTiles files may have internal maxzoom - if features don't appear until z13,
+      // the file might only contain features at higher zoom levels despite the filename
+    };
+  }
+  
   return sources;
 }
 

@@ -21,6 +21,7 @@ export { createGridLayers } from "./grid.js";
 export { createHillshadeLayers } from "./hillshade.js";
 export { createAerowayLayers } from "./aeroway.js";
 export { createBoundaryLayers, createUSBoundaryLayers } from "./boundaries.js";
+export { createPlacesLayers } from "./places.js";
 export { createWorldRoadLayers, createUSRoadLayers, createUSOverlayRoadLayers } from "./roads.js";
 export { 
   createRoadLabelLayers,
@@ -47,6 +48,7 @@ import { createGridLayers } from "./grid.js";
 import { createHillshadeLayers } from "./hillshade.js";
 import { createAerowayLayers } from "./aeroway.js";
 import { createBoundaryLayers, createUSBoundaryLayers } from "./boundaries.js";
+import { createPlacesLayers } from "./places.js";
 import { createWorldRoadLayers, createUSRoadLayers, createUSOverlayRoadLayers } from "./roads.js";
 import { 
   createRoadLabelLayers,
@@ -85,6 +87,7 @@ export function createAllLayers(theme: Theme): LayerSpecification[] {
     ...(hideOverWater ? [] : createBoundaryLayers(theme)),
     ...createIceLayers(theme),  // Render ice after boundaries so boundaries don't show through
     ...createGridLayers(theme),  // Grid lines render on top of all features
+    ...createPlacesLayers(theme),  // Places boundaries render before roads
     ...createWorldRoadLayers(theme),
     ...createUSRoadLayers(theme),
     ...createUSLandLayers(theme),
