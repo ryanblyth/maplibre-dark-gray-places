@@ -52,6 +52,13 @@ export function formatAttributeValue(key: string, value: any): string {
       return `${value.toFixed(2)}%`;
     }
     
+    // Check if it's a density field (population density)
+    const lowerKey = key.toLowerCase();
+    if (lowerKey.includes('density') || lowerKey === 'pop_density' || lowerKey === 'population_density' || lowerKey === 'pop_density_sqmi') {
+      // Format density as rounded integer (no decimal places, no units)
+      return Math.round(value).toLocaleString();
+    }
+    
     // Default number formatting with commas
     return value.toLocaleString();
   }
@@ -119,15 +126,44 @@ export function formatPopupHTML(geoid: string, attrs: PlaceAttributes, featurePr
              key !== 'id';
     })
     .sort((a, b) => {
+      const aKey = a[0].toLowerCase();
+      const bKey = b[0].toLowerCase();
+      
+      // Check if a field is a density field (including pop_density_sqmi)
+      const isDensity = (key: string) => {
+        return key === 'pop_density' || 
+               key === 'population_density' || 
+               key === 'density' ||
+               key === 'pop_density_sqmi' ||
+               key.includes('density');
+      };
+      
+      // Explicit ordering: pop_total first, then density fields, then others
+      const isPopTotal = aKey === 'pop_total' || aKey === 'population';
+      const isBDensity = isDensity(bKey);
+      const isADensity = isDensity(aKey);
+      const isBPopTotal = bKey === 'pop_total' || bKey === 'population';
+      
+      // If one is pop_total and the other is density, ensure pop_total comes first
+      if (isPopTotal && isBDensity) return -1;
+      if (isBPopTotal && isADensity) return 1;
+      
+      // If both are density fields, sort alphabetically
+      if (isADensity && isBDensity) return a[0].localeCompare(b[0]);
+      
       // Sort with important fields first
       const priority: Record<string, number> = {
         'pop_total': 1,
         'population': 1,
-        'median_hh_income': 2,
-        'median_age': 3,
+        'pop_density': 2,
+        'population_density': 2,
+        'pop_density_sqmi': 2,
+        'density': 2,
+        'median_hh_income': 3,
+        'median_age': 4,
       };
-      const aPriority = priority[a[0].toLowerCase()] || 99;
-      const bPriority = priority[b[0].toLowerCase()] || 99;
+      const aPriority = priority[aKey] || (isADensity ? 2 : 99);
+      const bPriority = priority[bKey] || (isBDensity ? 2 : 99);
       if (aPriority !== bPriority) return aPriority - bPriority;
       return a[0].localeCompare(b[0]);
     });
