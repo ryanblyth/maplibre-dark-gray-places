@@ -87,7 +87,6 @@ export function createAllLayers(theme: Theme): LayerSpecification[] {
     ...(hideOverWater ? [] : createBoundaryLayers(theme)),
     ...createIceLayers(theme),  // Render ice after boundaries so boundaries don't show through
     ...createGridLayers(theme),  // Grid lines render on top of all features
-    ...createPlacesLayers(theme),  // Places boundaries render before roads
     ...createWorldRoadLayers(theme),
     ...createUSRoadLayers(theme),
     ...createUSLandLayers(theme),
@@ -99,8 +98,12 @@ export function createAllLayers(theme: Theme): LayerSpecification[] {
     ...createWaterLabelLayersFromWorldLabels(theme),
     ...createWaterLabelLayersFromBasemapSources(theme),
     ...createWaterwayLabelLayers(theme),
+    // Render places before labels if renderAboveLabels is false
+    ...(theme.places?.renderAboveLabels === false ? createPlacesLayers(theme) : []),
     ...createPlaceLabelLayers(theme),
     ...createPOILayers(theme),
+    // Render places after labels if renderAboveLabels is true (or undefined, default behavior)
+    ...(theme.places?.renderAboveLabels !== false ? createPlacesLayers(theme) : []),
   ];
 }
 

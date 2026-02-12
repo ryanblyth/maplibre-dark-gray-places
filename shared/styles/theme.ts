@@ -778,6 +778,26 @@ export interface Theme {
 // PLACES CONFIGURATION
 // ============================================================================
 
+/** Population density color range configuration */
+export interface DensityColorRange {
+  /** Population density threshold (people per sq mi) */
+  threshold: number;
+  /** Fill color for this density range */
+  fillColor: string;
+  /** Optional outline color (auto-darkened from fillColor if not provided) */
+  outlineColor?: string;
+}
+
+/** Population density color configuration */
+export interface DensityColors {
+  /** Default color for densities below the first threshold */
+  defaultFillColor: string;
+  /** Default outline color (auto-darkened if not provided) */
+  defaultOutlineColor?: string;
+  /** Array of density ranges, sorted by threshold (lowest to highest) */
+  ranges: DensityColorRange[];
+}
+
 /** Configuration for places data layer (boundaries of incorporated places) */
 export interface ThemePlaces {
   /** Whether to show places layer at all */
@@ -786,19 +806,29 @@ export interface ThemePlaces {
   minZoom: number;
   /** Fill styling for place boundaries */
   fill: {
-    /** Fill color */
+    /** Fill color (fallback used when density data is not available) */
     color: string;
-    /** Base fill opacity (can be enhanced by data-driven styling) */
-    opacity: number;
+    /** 
+     * Base fill opacity (0.0 to 1.0)
+     * Can be enhanced by data-driven styling based on population.
+     * Default: 0.15 if not specified.
+     * Adjust this value to control the transparency of place fills.
+     */
+    opacity?: number;
   };
   /** Outline styling for place boundaries */
   outline: {
-    /** Outline color */
+    /** Outline color (fallback used when density data is not available) */
     color: string;
     /** Outline width at different zoom levels */
     width: { z5: number; z10: number; z15: number };
-    /** Outline opacity */
-    opacity: number;
+    /** 
+     * Outline opacity (0.0 to 1.0)
+     * Controls the transparency of place boundary lines.
+     * Default: 0.6 if not specified.
+     * Adjust this value to make boundaries more or less visible.
+     */
+    opacity?: number;
   };
   /** Interactivity configuration for click popups and hover effects */
   interactivity?: {
@@ -811,6 +841,18 @@ export interface ThemePlaces {
     /** CSS max-height for popup content (enables scrolling for long attribute lists) */
     popupMaxHeight?: string;
   };
+  /** 
+   * Population density color configuration
+   * Defines color ranges based on population density (people per sq mi)
+   * If not provided, uses default hardcoded color scheme
+   */
+  densityColors?: DensityColors;
+  /** 
+   * Whether to render places boundaries above city/place labels
+   * - true (default): Places boundaries render on top of city labels
+   * - false: Places boundaries render below city labels (labels will be visible on top)
+   */
+  renderAboveLabels?: boolean;
 }
 
 // ============================================================================
