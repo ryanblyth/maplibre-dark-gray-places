@@ -861,20 +861,50 @@ export const myCustomMapFixedPlaces: ThemePlaces = {
   minZoom: 5,
   /** Fill styling for place boundaries */
   fill: {
-    color: "#6a7588",  // Medium gray to match theme
-    opacity: 0.15,     // Base opacity, will be enhanced by population
+    color: "#6a7588",  // Medium gray to match theme (fallback when density data unavailable)
+    opacity: 1,      // Base fill opacity (0.0-1.0). Adjust to control transparency.
+                        // This is the base opacity; population-based styling can add up to 0.2 more.
+                        // To make places more opaque, increase this value (e.g., 0.3, 0.5, or 1.0).
   },
   /** Outline styling for place boundaries */
   outline: {
-    color: "#8a9598",  // Lighter gray for borders
+    color: "#8a9598",  // Lighter gray for borders (fallback when density data unavailable)
     width: { z5: 0.5, z10: 1.0, z15: 1.5 },
-    opacity: 0.6,
+    opacity: 0.6,      // Outline opacity (0.0-1.0). Adjust to control boundary line visibility.
+                        // To make boundaries more visible, increase (e.g., 0.8 or 1.0).
+                        // To make boundaries more subtle, decrease (e.g., 0.3 or 0.4).
   },
   /** Interactivity configuration */
   interactivity: {
     enabled: true,
     autoDetectStates: true,
     popupMaxHeight: "400px",
+  },
+  /** 
+   * Whether to render places boundaries above city/place labels
+   * - true (default): Places boundaries render on top of city labels
+   * - false: Places boundaries render below city labels (labels visible on top)
+   */
+  renderAboveLabels: false,
+  /** Population density color configuration */
+  // { threshold: 100, fillColor: "#efc47e", outlineColor: "#c9a366" } with border color
+  // { threshold: 100, fillColor: "#efc47e"} with default border color
+  densityColors: {
+    defaultFillColor: "#ecda9a",      // Default for < 100
+    defaultOutlineColor: "#c4b87a",  // Darker version of default fill
+    ranges: [
+      { threshold: 100, fillColor: "#f6e6b8"},
+      { threshold: 300, fillColor: "#f3d28f"},
+      { threshold: 1000, fillColor: "#f0bd6b"},
+      { threshold: 2000, fillColor: "#f2a14a"},
+      { threshold: 3000, fillColor: "#f08a2a"},
+      { threshold: 4000, fillColor: "#ef6800"},
+      { threshold: 5000, fillColor: "#f04f1a"},
+      { threshold: 7500, fillColor: "#f03a34"},
+      { threshold: 10000, fillColor: "#ee2b4e"},
+      { threshold: 15000, fillColor: "#e21f64"},
+      { threshold: 25000, fillColor: "#c81b78"},
+    ],
   },
 };
 
