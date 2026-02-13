@@ -729,131 +729,7 @@ export interface ThemeGrid {
   };
 }
 
-// ============================================================================
-// COMPLETE THEME TYPE
-// ============================================================================
 
-/** Type definition for a complete basemap theme */
-export interface Theme {
-  name: string;
-  fonts: FontStack;
-  colors: ThemeColors;
-  widths: ThemeWidths;
-  opacities: ThemeOpacities;
-  settings?: ThemeSettings;
-  /** Per-label-type font configuration - optional, falls back to fonts.regular/italic */
-  labelFonts?: ThemeLabelFonts;
-  /** Highway shield configuration - optional, defaults to enabled with standard sprites */
-  shields?: ThemeShields;
-  /** POI configuration - optional, defaults to all enabled */
-  pois?: ThemePOIs;
-  /** Bathymetry configuration - optional, defaults to disabled */
-  bathymetry?: ThemeBathymetry;
-  /** Contours configuration - optional, defaults to disabled */
-  contours?: ThemeContours;
-  /** Ice configuration - optional, defaults to disabled */
-  ice?: ThemeIce;
-  /** Grid lines configuration - optional, defaults to disabled */
-  grid?: ThemeGrid;
-  /** Boundary configuration - optional, defaults to all enabled */
-  boundary?: ThemeBoundary;
-  /** Building configuration - optional */
-  buildings?: ThemeBuildings;
-  /** Landcover configuration - optional, for controlling landcover visibility and colors */
-  land?: ThemeLand;
-  /** Landuse configuration - optional, for controlling landuse visibility and colors */
-  landuse?: ThemeLanduse;
-  /** Water configuration - optional, for controlling water visibility and colors */
-  water?: ThemeWater;
-  hillshade?: ThemeHillshade;
-  /** Aeroway configuration - optional, for airport/aerodrome features */
-  aeroway?: ThemeAeroway;
-  /** Starfield configuration - optional, for globe projection background */
-  starfield?: ThemeStarfield;
-  /** Places configuration - optional, for incorporated places boundaries */
-  places?: ThemePlaces;
-}
-
-// ============================================================================
-// PLACES CONFIGURATION
-// ============================================================================
-
-/** Population density color range configuration */
-export interface DensityColorRange {
-  /** Population density threshold (people per sq mi) */
-  threshold: number;
-  /** Fill color for this density range */
-  fillColor: string;
-  /** Optional outline color (auto-darkened from fillColor if not provided) */
-  outlineColor?: string;
-}
-
-/** Population density color configuration */
-export interface DensityColors {
-  /** Default color for densities below the first threshold */
-  defaultFillColor: string;
-  /** Default outline color (auto-darkened if not provided) */
-  defaultOutlineColor?: string;
-  /** Array of density ranges, sorted by threshold (lowest to highest) */
-  ranges: DensityColorRange[];
-}
-
-/** Configuration for places data layer (boundaries of incorporated places) */
-export interface ThemePlaces {
-  /** Whether to show places layer at all */
-  enabled: boolean;
-  /** Minimum zoom level to show places */
-  minZoom: number;
-  /** Fill styling for place boundaries */
-  fill: {
-    /** Fill color (fallback used when density data is not available) */
-    color: string;
-    /** 
-     * Base fill opacity (0.0 to 1.0)
-     * Can be enhanced by data-driven styling based on population.
-     * Default: 0.15 if not specified.
-     * Adjust this value to control the transparency of place fills.
-     */
-    opacity?: number;
-  };
-  /** Outline styling for place boundaries */
-  outline: {
-    /** Outline color (fallback used when density data is not available) */
-    color: string;
-    /** Outline width at different zoom levels */
-    width: { z5: number; z10: number; z15: number };
-    /** 
-     * Outline opacity (0.0 to 1.0)
-     * Controls the transparency of place boundary lines.
-     * Default: 0.6 if not specified.
-     * Adjust this value to make boundaries more or less visible.
-     */
-    opacity?: number;
-  };
-  /** Interactivity configuration for click popups and hover effects */
-  interactivity?: {
-    /** Whether to enable click popups and interactivity */
-    enabled: boolean;
-    /** Array of state FIPS codes to pre-load (overrides auto-detection) */
-    preloadStates?: string[];
-    /** Auto-detect visible states from viewport (default: true) */
-    autoDetectStates?: boolean;
-    /** CSS max-height for popup content (enables scrolling for long attribute lists) */
-    popupMaxHeight?: string;
-  };
-  /** 
-   * Population density color configuration
-   * Defines color ranges based on population density (people per sq mi)
-   * If not provided, uses default hardcoded color scheme
-   */
-  densityColors?: DensityColors;
-  /** 
-   * Whether to render places boundaries above city/place labels
-   * - true (default): Places boundaries render on top of city labels
-   * - false: Places boundaries render below city labels (labels will be visible on top)
-   */
-  renderAboveLabels?: boolean;
-}
 
 // ============================================================================
 // LAND CONFIGURATION
@@ -1047,4 +923,130 @@ export interface ThemeAeroway {
     /** Font size for detailed airport labels (z13+) */
     detailedSize?: number | { min: number; max: number };
   };
+}
+
+// ============================================================================
+// PLACES CONFIGURATION
+// ============================================================================
+
+/** Population density color range configuration */
+export interface DensityColorRange {
+  /** Population density threshold (people per sq mi) */
+  threshold: number;
+  /** Fill color for this density range */
+  fillColor: string;
+  /** Optional outline color (auto-darkened from fillColor if not provided) */
+  outlineColor?: string;
+}
+
+/** Population density color configuration */
+export interface DensityColors {
+  /** Default color for densities below the first threshold */
+  defaultFillColor: string;
+  /** Default outline color (auto-darkened if not provided) */
+  defaultOutlineColor?: string;
+  /** Array of density ranges, sorted by threshold (lowest to highest) */
+  ranges: DensityColorRange[];
+}
+
+/** Configuration for places data layer (boundaries of incorporated places) */
+export interface ThemePlaces {
+  /** Whether to show places layer at all */
+  enabled: boolean;
+  /** Minimum zoom level to show places */
+  minZoom: number;
+  /** Fill styling for place boundaries */
+  fill: {
+    /** Fill color (fallback used when density data is not available) */
+    color: string;
+    /** 
+     * Base fill opacity (0.0 to 1.0)
+     * Can be enhanced by data-driven styling based on population.
+     * Default: 0.15 if not specified.
+     * Adjust this value to control the transparency of place fills.
+     */
+    opacity?: number;
+  };
+  /** Outline styling for place boundaries */
+  outline: {
+    /** Outline color (fallback used when density data is not available) */
+    color: string;
+    /** Outline width at different zoom levels */
+    width: { z5: number; z10: number; z15: number };
+    /** 
+     * Outline opacity (0.0 to 1.0)
+     * Controls the transparency of place boundary lines.
+     * Default: 0.6 if not specified.
+     * Adjust this value to make boundaries more or less visible.
+     */
+    opacity?: number;
+  };
+  /** Interactivity configuration for click popups and hover effects */
+  interactivity?: {
+    /** Whether to enable click popups and interactivity */
+    enabled: boolean;
+    /** Array of state FIPS codes to pre-load (overrides auto-detection) */
+    preloadStates?: string[];
+    /** Auto-detect visible states from viewport (default: true) */
+    autoDetectStates?: boolean;
+    /** CSS max-height for popup content (enables scrolling for long attribute lists) */
+    popupMaxHeight?: string;
+  };
+  /** 
+   * Population density color configuration
+   * Defines color ranges based on population density (people per sq mi)
+   * If not provided, uses default hardcoded color scheme
+   */
+  densityColors?: DensityColors;
+  /** 
+   * Whether to render places boundaries above city/place labels
+   * - true (default): Places boundaries render on top of city labels
+   * - false: Places boundaries render below city labels (labels will be visible on top)
+   */
+  renderAboveLabels?: boolean;
+}
+
+// ============================================================================
+// COMPLETE THEME TYPE
+// ============================================================================
+
+/** Type definition for a complete basemap theme */
+export interface Theme {
+  name: string;
+  fonts: FontStack;
+  colors: ThemeColors;
+  widths: ThemeWidths;
+  opacities: ThemeOpacities;
+  settings?: ThemeSettings;
+  /** Per-label-type font configuration - optional, falls back to fonts.regular/italic */
+  labelFonts?: ThemeLabelFonts;
+  /** Highway shield configuration - optional, defaults to enabled with standard sprites */
+  shields?: ThemeShields;
+  /** POI configuration - optional, defaults to all enabled */
+  pois?: ThemePOIs;
+  /** Bathymetry configuration - optional, defaults to disabled */
+  bathymetry?: ThemeBathymetry;
+  /** Contours configuration - optional, defaults to disabled */
+  contours?: ThemeContours;
+  /** Ice configuration - optional, defaults to disabled */
+  ice?: ThemeIce;
+  /** Grid lines configuration - optional, defaults to disabled */
+  grid?: ThemeGrid;
+  /** Boundary configuration - optional, defaults to all enabled */
+  boundary?: ThemeBoundary;
+  /** Building configuration - optional */
+  buildings?: ThemeBuildings;
+  /** Landcover configuration - optional, for controlling landcover visibility and colors */
+  land?: ThemeLand;
+  /** Landuse configuration - optional, for controlling landuse visibility and colors */
+  landuse?: ThemeLanduse;
+  /** Water configuration - optional, for controlling water visibility and colors */
+  water?: ThemeWater;
+  hillshade?: ThemeHillshade;
+  /** Aeroway configuration - optional, for airport/aerodrome features */
+  aeroway?: ThemeAeroway;
+  /** Starfield configuration - optional, for globe projection background */
+  starfield?: ThemeStarfield;
+  /** Places configuration - optional, for incorporated places boundaries */
+  places?: ThemePlaces;
 }
