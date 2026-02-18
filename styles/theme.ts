@@ -1,12 +1,24 @@
 /**
  * My Custom Map Fixed Basemap Theme
  * 
- * This file contains ALL configurable values for the my-custom-map-fixed basemap:
- * - Colors (fills, strokes, labels)
- * - Line widths (roads, boundaries, water)
- * - Opacities
+ * This file contains ALL configurable values for the my-custom-map-fixed basemap.
  * 
- * To create a new basemap, copy this file and adjust the values.
+ * FILE STRUCTURE:
+ * ============================================================================
+ * 1. BASEMAP STYLE CONFIGURATIONS
+ *    - All basemap styling (colors, widths, opacities, fonts, etc.)
+ *    - These can be copied/pasted between themes to reuse basemap styles
+ * 
+ * 2. DATA OVERLAY CONFIGURATIONS
+ *    - Data overlay styling (places layer, etc.)
+ *    - These are typically theme-specific and may vary per implementation
+ * 
+ * 3. COMPLETE THEME ASSEMBLY
+ *    - Final theme object that combines all configurations
+ * ============================================================================
+ * 
+ * To create a new basemap, copy the BASEMAP STYLE CONFIGURATIONS section
+ * and adjust the values. Then add your own DATA OVERLAY CONFIGURATIONS.
  */
 
 import { 
@@ -20,6 +32,21 @@ import {
   type ThemeLabelFonts,
   type ThemePlaces
 } from "../shared/styles/index.js";
+
+// ============================================================================
+// BASEMAP STYLE CONFIGURATIONS
+// ============================================================================
+//
+// This section contains all basemap styling configurations:
+// - Settings, fonts, colors, widths, opacities
+// - Basemap layers (roads, water, land, buildings, etc.)
+// - Visual effects (hillshade, bathymetry, contours, etc.)
+//
+// These configurations can be copied/pasted between themes to reuse
+// basemap styles. Simply copy everything from this section through
+// the AEROWAY CONFIGURATION section.
+//
+// ============================================================================
 
 // ============================================================================
 // SETTINGS
@@ -851,6 +878,78 @@ export const myCustomMapFixedWater = {
 };
 
 // ============================================================================
+// AEROWAY CONFIGURATION
+// ============================================================================
+
+export const myCustomMapFixedAeroway = {
+  /** Whether to show aeroway features at all */
+  enabled: false,
+  
+  /** Runway line styling */
+  runway: {
+    color: "#4a5568",        // Medium gray for runways
+    width: 0.5,              // Thin lines
+    opacity: 0.8,
+    majorLength: 2500,       // Minimum length (meters) for major runways shown at z6-7
+  },
+  
+  /** Apron polygon styling */
+  apron: {
+    fillColor: "#4a5568",    // Dark gray fill
+    fillOpacity: 0.3,         // Thin fill (semi-transparent)
+    outlineColor: "#5a6578",  // Medium gray outline
+    outlineWidth: 0.3,        // Thin outline
+  },
+  
+  /** Taxiway line styling */
+  taxiway: {
+    color: "#6a7588",        // Slightly lighter gray than runways
+    width: 0.4,              // Slightly thinner than runways
+    opacity: 0.7,
+  },
+  
+  /** Helipad point styling */
+  helipad: {
+    fillColor: "#6a7588",    // Medium gray fill
+    fillOpacity: 0.6,
+    outlineColor: "#7a8598", // Lighter gray outline
+    outlineWidth: 0.3,
+    size: 4,                 // Circle radius in pixels
+  },
+  
+  /** Airport label styling */
+  label: {
+    color: "#b8c8e0",        // Light blue-gray text (matches place labels)
+    haloColor: "#0b0f14",    // Dark halo for contrast
+    haloWidth: 0,
+    opacity: 0.9,
+    majorSize: { min: 10, max: 12 },      // Font size for major airports (z8-9)
+    detailedSize: { min: 10, max: 12 },   // Font size for detailed labels (z13+)
+  },
+};
+
+// ============================================================================
+// END OF BASEMAP STYLE CONFIGURATIONS
+// ============================================================================
+//
+// Everything above this line is basemap styling and can be copied
+// between themes. Everything below is data overlays and theme assembly.
+//
+// ============================================================================
+
+// ============================================================================
+// DATA OVERLAY CONFIGURATIONS
+// ============================================================================
+//
+// This section contains data overlay styling configurations:
+// - Places layer (city boundaries, demographic data overlays, etc.)
+//
+// These configurations are typically theme-specific and may vary
+// per implementation. They overlay on top of the basemap.
+//
+// ============================================================================
+
+// ============================================================================
 // PLACES CONFIGURATION
 // ============================================================================
 
@@ -909,58 +1008,16 @@ export const myCustomMapFixedPlaces: ThemePlaces = {
 };
 
 // ============================================================================
-// AEROWAY CONFIGURATION
+// END OF DATA OVERLAY CONFIGURATIONS
 // ============================================================================
 
-export const myCustomMapFixedAeroway = {
-  /** Whether to show aeroway features at all */
-  enabled: false,
-  
-  /** Runway line styling */
-  runway: {
-    color: "#4a5568",        // Medium gray for runways
-    width: 0.5,              // Thin lines
-    opacity: 0.8,
-    majorLength: 2500,       // Minimum length (meters) for major runways shown at z6-7
-  },
-  
-  /** Apron polygon styling */
-  apron: {
-    fillColor: "#4a5568",    // Dark gray fill
-    fillOpacity: 0.3,         // Thin fill (semi-transparent)
-    outlineColor: "#5a6578",  // Medium gray outline
-    outlineWidth: 0.3,        // Thin outline
-  },
-  
-  /** Taxiway line styling */
-  taxiway: {
-    color: "#6a7588",        // Slightly lighter gray than runways
-    width: 0.4,              // Slightly thinner than runways
-    opacity: 0.7,
-  },
-  
-  /** Helipad point styling */
-  helipad: {
-    fillColor: "#6a7588",    // Medium gray fill
-    fillOpacity: 0.6,
-    outlineColor: "#7a8598", // Lighter gray outline
-    outlineWidth: 0.3,
-    size: 4,                 // Circle radius in pixels
-  },
-  
-  /** Airport label styling */
-  label: {
-    color: "#b8c8e0",        // Light blue-gray text (matches place labels)
-    haloColor: "#0b0f14",    // Dark halo for contrast
-    haloWidth: 0,
-    opacity: 0.9,
-    majorSize: { min: 10, max: 12 },      // Font size for major airports (z8-9)
-    detailedSize: { min: 10, max: 12 },   // Font size for detailed labels (z13+)
-  },
-};
-
 // ============================================================================
-// COMPLETE THEME
+// COMPLETE THEME ASSEMBLY
+// ============================================================================
+//
+// This section combines all basemap and data overlay configurations
+// into the final theme object.
+//
 // ============================================================================
 
 export const myCustomMapFixedTheme: Theme = {
