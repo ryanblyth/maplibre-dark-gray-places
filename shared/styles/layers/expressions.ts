@@ -4,6 +4,7 @@
  * These functions generate MapLibre expression arrays based on theme values.
  */
 
+import type { ExpressionSpecification, FilterSpecification } from "maplibre-gl";
 import type { ThemeColors, ThemeWidths, ZoomWidths, RoadClassWidths } from "../theme.js";
 
 // ============================================================================
@@ -341,7 +342,7 @@ export function buildingFillColor(c: ThemeColors, heightColorsMinZoom?: number):
 // COMMON FILTERS
 // ============================================================================
 
-export const filters = {
+export const filters: Record<string, ExpressionSpecification | FilterSpecification> = {
   hasName: ["any", ["has", "name"], ["has", "name:en"]],
   majorRoad: ["all", ["!=", ["get", "brunnel"], "tunnel"], ["!=", ["get", "brunnel"], "bridge"], ["match", ["get", "class"], ["motorway", "trunk", "primary", "secondary"], true, false]],
   // Normal roads excluding alleys and parking aisles (they have separate layers with higher minzoom)

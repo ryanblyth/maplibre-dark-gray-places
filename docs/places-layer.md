@@ -165,6 +165,20 @@ Update map feature states with attribute data for data-driven styling.
 
 ## Styling
 
+### Low-zoom points vs polygons
+
+- Low-zoom points are drawn from `places-low-source` and fade out around z6.5, while polygons fade in.
+- Theme toggles:
+  - `places.pointsEnabled` / `places.polygonsEnabled`
+- Point styling (supports single value, stop array, or named-stop object like `{ z0: 1, z6_5: 3 }`):
+  - `places.points.radius`
+  - `places.points.strokeWidth`
+  - `places.points.strokeColor`
+  - `places.points.opacity` (literal opacity stops; no density multiplier applied)
+- Polygon styling:
+  - `places.minZoom` (polygons start at this zoom; default 5)
+  - Polygons crossfade in from z5–6.5; outlines stay visible with a low start opacity.
+
 ### Popup Styling
 
 The popup uses dark theme styling that matches the map. Customize in your HTML:

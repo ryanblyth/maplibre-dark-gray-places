@@ -101,6 +101,12 @@ export function createBasemapSources(config: BaseStyleConfig, theme?: Theme): Re
   
   // Only add places source if enabled in theme
   if (theme?.places?.enabled) {
+    sources["places-low-source"] = {
+      type: "vector",
+      url: "pmtiles://https://data.storypath.studio/pmtiles/places/places_cb_2024_points_acs5_2024_density_z0.pmtiles",
+      minzoom: 0,
+      maxzoom: 7,
+    };
     sources["places-source"] = {
       type: "vector",
       url: "pmtiles://https://data.storypath.studio/pmtiles/places/places_cb_2024_500k_z5.pmtiles",

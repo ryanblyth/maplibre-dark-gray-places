@@ -956,9 +956,24 @@ export const myCustomMapFixedAeroway = {
 export const myCustomMapFixedPlaces: ThemePlaces = {
   /** Whether to show places layer at all */
   enabled: true,
-  /** Minimum zoom level to show places */
+  /** Toggle low-zoom points/dots */
+  pointsEnabled: true,
+  /** Toggle polygons (fills/lines) */
+  polygonsEnabled: true,
+  /** Minimum zoom level to show ploygon places */
   minZoom: 5,
-  /** Fill styling for place boundaries */
+  /** Low-zoom places point styling (dots/clusters) */
+  points: {
+    /** Radius for non-cluster points; named zoom stops { z0: 1, z5: 1, z6_5: 0 } */
+    radius: { z0: .25, z3: 1, z6_5: 3 },
+    /** Stroke width for points/clusters; named zoom stops { z0: 1, z5: 1, z6_5: 0 } */
+    strokeWidth: { z0: 0, z6_5: 0 },
+    /** Stroke color for points/clusters */
+    strokeColor: "#111822",
+    /** Opacity stops for point crossfade { z0: 1, z5: 1, z6_5: 0 } */
+    opacity: { z0: 1, z5: 1, z6_5: 0 },
+  },
+  /** Polygon styling for place boundaries */
   fill: {
     color: "#6a7588",  // Medium gray to match theme (fallback when density data unavailable)
     opacity: 1,      // Base fill opacity (0.0-1.0). Adjust to control transparency.
