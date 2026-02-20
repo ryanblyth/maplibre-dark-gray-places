@@ -953,8 +953,38 @@ export interface DensityColors {
 export interface ThemePlaces {
   /** Whether to show places layer at all */
   enabled: boolean;
+  /** Whether to render point/dot representation */
+  pointsEnabled?: boolean;
+  /** Whether to render polygon boundaries */
+  polygonsEnabled?: boolean;
   /** Minimum zoom level to show places */
   minZoom: number;
+  /** Low-zoom point styling for places */
+  points?: {
+    /** 
+     * Base radius for non-cluster points.
+     * Accepts:
+     * - single number (pixels)
+     * - zoom/stop tuples: [zoom, radiusPixels, zoom, radiusPixels, ...]
+     * - object of named stops: { z0: 1, z6_5: 3 }
+     */
+    radius?: number | number[] | Record<string, number>;
+    /** 
+     * Stroke width for points/clusters.
+     * Accepts:
+     * - single number (pixels)
+     * - zoom/stop tuples: [zoom, widthPixels, zoom, widthPixels, ...]
+     * - object of named stops: { z0: 0.1, z6_5: 0.25 }
+     */
+    strokeWidth?: number | number[] | Record<string, number>;
+    /** Stroke color for points/clusters */
+    strokeColor?: string;
+    /** 
+     * Opacity for points/clusters.
+     * Accepts zoom/stop tuples: [zoom, opacity, zoom, opacity, ...] or object stops { z0: 1, z6_5: 0 }
+     */
+    opacity?: number[] | Record<string, number>;
+  };
   /** Fill styling for place boundaries */
   fill: {
     /** Fill color (fallback used when density data is not available) */
