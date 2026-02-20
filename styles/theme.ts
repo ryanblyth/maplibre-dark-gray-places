@@ -290,8 +290,8 @@ export const myCustomMapFixedColors: ThemeColors = {
   // Labels - Harmonious monochrome grays with good contrast
   label: {
     place: {
-      color: "#b1b1b1",      // Light gray for good contrast
-      halo: "#252525",       // Very dark halo
+      color: "#f7eddf",      // Light gray for good contrast
+      halo: "#1a1020",       // Very dark halo (width set in shared/styles/layers/labels/place.ts)
     },
     road: {
       major: { color: "#b1b1b1", opacity: 0.8 },      // Light gray
@@ -414,7 +414,7 @@ export const myCustomMapFixedOpacities: ThemeOpacities = {
   tunnel: 0.7,
   
   label: {
-    place: 0.75,
+    place: 0.9,
     water: 0.9,
     waterway: 0.85,
   },
