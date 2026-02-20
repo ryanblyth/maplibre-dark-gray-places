@@ -204,6 +204,10 @@ The popup uses dark theme styling that matches the map. Customize in your HTML:
 }
 ```
 
+### Place label halo width
+
+- Place label halos use fixed widths set in `shared/styles/layers/labels/place.ts` (`text-halo-width` 2px and 1.5px variants). These widths are not theme-configurable; change them in that layer file if you need different halo sizes.
+
 ### Data-Driven Fill Opacity
 
 Places with higher populations get increased opacity:
