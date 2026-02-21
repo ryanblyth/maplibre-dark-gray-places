@@ -15,6 +15,69 @@ import type { Map as MapLibreMap, MapGeoJSONFeature } from "maplibre-gl";
 import type { PlaceAttributes, PlacesAttributeData } from "./placesData.js";
 
 /**
+ * Configuration for a single popup attribute
+ */
+export interface PlacePopupAttributeConfig {
+  /** Override label to display */
+  label?: string;
+  /** Hide this attribute from the popup */
+  hidden?: boolean;
+  /** Order weight (lower renders first). Falls back to default priority when unset */
+  order?: number;
+}
+
+/** Mapping of attribute keys to popup configs */
+export type PlacePopupAttributeConfigMap = Record<string, PlacePopupAttributeConfig>;
+
+/**
+ * Template attribute configuration reflecting current popup fields.
+ * Consumers can spread/override this when initializing interactivity.
+ */
+export const defaultPlacePopupAttributeConfig: PlacePopupAttributeConfigMap = {
+  pop_total: { label: "Pop Total", order: 1 },
+  pop_density_sqmi: { label: "Pop Density Sq Mile", order: 2 },
+  median_hh_income: { label: "Median Hh Income", order: 3 },
+  median_age: { label: "Median Age", order: 4 },
+  avg_household_size: { label: "Avg Household Size", order: 5 },
+  households: { label: "Households", order: 6 },
+  housing_units: { label: "Housing Units", order: 7 },
+  mean_commute_min: { label: "Mean Commute Min", order: 8 },
+  median_gross_rent: { label: "Median Gross Rent", order: 9 },
+  median_home_value: { label: "Median Home Value", order: 10 },
+  median_owner_cost_mortgage: { label: "Median Owner Cost Mortgage", order: 11 },
+  pct_bach_plus: { label: "% Bachelor's or Higher", order: 12 },
+  pct_carpool: { label: "% Carpool", order: 13, hidden: true },
+  pct_drive_alone: { label: "% Drive Alone", order: 14 },
+  pct_hispanic: { label: "% Hispanic", order: 15 },
+  pct_hs_grad: { label: "% High School Graduate", order: 16 },
+  pct_in_labor_force: { label: "% In Labor Force", order: 17 },
+  pct_insured: { label: "% Insured", order: 18 },
+  pct_no_vehicle: { label: "% No Vehicle", order: 19 },
+  pct_nonhisp_asian: { label: "% Asian", order: 20 },
+  pct_nonhisp_black: { label: "% Black", order: 21 },
+  pct_nonhisp_white: { label: "% Non-Hispanic White", order: 22 },
+  pct_over65: { label: "% Over 65", order: 23 },
+  pct_owner_occ: { label: "% Owner Occupied", order: 24 },
+  pct_poverty: { label: "% Poverty", order: 25 },
+  pct_transit: { label: "% Transit", order: 26 },
+  pct_under18: { label: "% Under 18", order: 27 },
+  pct_vacant: { label: "% Vacant", order: 28 },
+  pct_wfh: { label: "% Work From Home", order: 29 },
+  per_capita_income: { label: "Per Capita Income", order: 30 },
+  unemployment_rate: { label: "Unemployment Rate", order: 31 },
+};
+
+function getAttributeConfig(
+  key: string,
+  config?: PlacePopupAttributeConfigMap
+): PlacePopupAttributeConfig | undefined {
+  if (!config) return undefined;
+  const lower = key.toLowerCase();
+  // Support exact and lowercase matches to be forgiving
+  return config[key] ?? config[lower];
+}
+
+/**
  * Formats an attribute key from snake_case to Title Case
  * 
  * @param key - Attribute key (e.g., "pop_total", "median_hh_income")
@@ -77,9 +140,15 @@ export function formatAttributeValue(key: string, value: any): string {
  * @param geoid - Place GEOID
  * @param attrs - Place attributes
  * @param featureProps - Feature properties from PMTiles (may contain name)
+ * @param attributeConfig - Optional per-attribute popup configuration
  * @returns HTML string for popup content
  */
-export function formatPopupHTML(geoid: string, attrs: PlaceAttributes, featureProps?: Record<string, any>): string {
+export function formatPopupHTML(
+  geoid: string,
+  attrs: PlaceAttributes,
+  featureProps?: Record<string, any>,
+  attributeConfig?: PlacePopupAttributeConfigMap
+): string {
   // Debug: log what we're looking for
   if (featureProps) {
     console.log('Feature properties keys:', Object.keys(featureProps));
@@ -119,6 +188,10 @@ export function formatPopupHTML(geoid: string, attrs: PlaceAttributes, featurePr
   // Build attributes list
   const attrEntries = Object.entries(attrs)
     .filter(([key]) => {
+      const cfg = getAttributeConfig(key, attributeConfig);
+      if (cfg?.hidden) {
+        return false;
+      }
       // Filter out name/metadata fields that we've already displayed
       const lowerKey = key.toLowerCase();
       return !lowerKey.includes('name') && 
@@ -129,6 +202,14 @@ export function formatPopupHTML(geoid: string, attrs: PlaceAttributes, featurePr
       const aKey = a[0].toLowerCase();
       const bKey = b[0].toLowerCase();
       
+      const aCfg = getAttributeConfig(a[0], attributeConfig);
+      const bCfg = getAttributeConfig(b[0], attributeConfig);
+      if (aCfg?.order !== undefined || bCfg?.order !== undefined) {
+        const aOrder = aCfg?.order ?? Number.POSITIVE_INFINITY;
+        const bOrder = bCfg?.order ?? Number.POSITIVE_INFINITY;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+      }
+
       // Check if a field is a density field (including pop_density_sqmi)
       const isDensity = (key: string) => {
         return key === 'pop_density' || 
@@ -170,7 +251,7 @@ export function formatPopupHTML(geoid: string, attrs: PlaceAttributes, featurePr
   
   const attrsHTML = attrEntries
     .map(([key, value]) => {
-      const label = formatAttributeKey(key);
+      const label = getAttributeConfig(key, attributeConfig)?.label ?? formatAttributeKey(key);
       const formattedValue = formatAttributeValue(key, value);
       return `
         <span class="places-popup-key">${label}:</span>
@@ -182,8 +263,8 @@ export function formatPopupHTML(geoid: string, attrs: PlaceAttributes, featurePr
   return `
     <div class="places-popup">
       <div class="places-popup-title">${title}</div>
-      <div class="places-popup-geoid">GEOID: ${geoid}</div>
       ${attrsHTML ? `<div class="places-popup-attrs">${attrsHTML}</div>` : '<div class="places-popup-no-data">No additional data available</div>'}
+      <div class="places-popup-geoid">GEOID: ${geoid}</div>
     </div>
   `;
 }
@@ -196,6 +277,7 @@ export function formatPopupHTML(geoid: string, attrs: PlaceAttributes, featurePr
  * @param attrs - Place attributes
  * @param lngLat - Click location [longitude, latitude]
  * @param offset - Popup offset in pixels (default: 10)
+ * @param attributeConfig - Optional per-attribute popup configuration
  * @returns MapLibre Popup instance
  */
 export function createPlacesPopup(
@@ -203,10 +285,11 @@ export function createPlacesPopup(
   feature: MapGeoJSONFeature,
   attrs: PlaceAttributes,
   lngLat: [number, number],
-  offset: number = 10
+  offset: number = 10,
+  attributeConfig?: PlacePopupAttributeConfigMap
 ): maplibregl.Popup {
   const geoid = String(feature.id || feature.properties?.GEOID || 'unknown');
-  const html = formatPopupHTML(geoid, attrs, feature.properties);
+  const html = formatPopupHTML(geoid, attrs, feature.properties, attributeConfig);
   
   const popup = new maplibregl.Popup({
     offset,
@@ -237,6 +320,7 @@ export function setupPlacesClickHandler(
     layerIds?: string[];
     popupOffset?: number;
     onClickCallback?: (geoid: string, attrs: PlaceAttributes) => void;
+    popupAttributeConfig?: PlacePopupAttributeConfigMap;
   } = {}
 ): void {
   console.log('🚀 setupPlacesClickHandler CALLED');
@@ -249,7 +333,8 @@ export function setupPlacesClickHandler(
     sourceLayer = "places",
     layerIds = ["places-fill", "places-outline"],
     popupOffset = 10,
-    onClickCallback
+    onClickCallback,
+    popupAttributeConfig
   } = options;
   
   // Global click handler that works at all zoom levels by querying source features
@@ -425,8 +510,8 @@ export function setupPlacesClickHandler(
         .setHTML(`
           <div class="places-popup">
             <div class="places-popup-title">${featureName}</div>
-            <div class="places-popup-geoid">GEOID: ${geoid}</div>
             <div class="places-popup-no-data">No attribute data available for this place.</div>
+            <div class="places-popup-geoid">GEOID: ${geoid}</div>
           </div>
         `)
         .addTo(map);
@@ -434,7 +519,7 @@ export function setupPlacesClickHandler(
     }
     
     // Create and show popup
-    createPlacesPopup(map, feature, attrs, [e.lngLat.lng, e.lngLat.lat], popupOffset);
+    createPlacesPopup(map, feature, attrs, [e.lngLat.lng, e.lngLat.lat], popupOffset, popupAttributeConfig);
     
     // Call optional callback
     if (onClickCallback) {
