@@ -20,6 +20,7 @@ import {
   setupPlacesClickHandler, 
   setupPlacesHoverCursor 
 } from "./placesPopup.js";
+import type { PlacePopupAttributeConfigMap } from "./placesPopup.js";
 
 /**
  * Options for places interactivity initialization
@@ -41,6 +42,8 @@ export interface PlacesInteractivityOptions {
   onInitComplete?: (loadedStates: string[], data: PlacesAttributeData) => void;
   /** Callback function called on click */
   onPlaceClick?: (geoid: string, attrs: any) => void;
+  /** Optional per-attribute popup config (label override, hide, order) */
+  popupAttributeConfig?: PlacePopupAttributeConfigMap;
 }
 
 /**
@@ -93,7 +96,8 @@ export async function initializePlacesInteractivity(
     sourceLayer = "places",
     layerIds = ["places-fill", "places-outline"],
     onInitComplete,
-    onPlaceClick
+    onPlaceClick,
+    popupAttributeConfig
   } = options;
   
   // Don't wait for map.loaded() - layers are available when style is loaded
@@ -175,7 +179,8 @@ export async function initializePlacesInteractivity(
         sourceLayer,
         layerIds: availableLayers,
         popupOffset,
-        onClickCallback: onPlaceClick
+        onClickCallback: onPlaceClick,
+        popupAttributeConfig
       });
       console.log('✅ Click handler setup completed');
     } catch (error) {

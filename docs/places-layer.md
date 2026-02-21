@@ -260,6 +260,27 @@ export const myCustomMapFixedPlaces: ThemePlaces = {
 };
 ```
 
+### Popup label/attribute configuration
+
+Control labels, visibility, and ordering with `popupAttributeConfig` when initializing interactivity. Keys are attribute names (snake_case).
+
+- `label`: override display text
+- `hidden`: set `true` to omit the attribute
+- `order`: lower numbers render first; falls back to default priority when unset
+
+```typescript
+await initializePlacesInteractivity(map, {
+  popupAttributeConfig: {
+    pop_total: { label: "Population", order: 1 },
+    median_hh_income: { label: "Median Household Income", order: 2 },
+    pct_bach_plus: { label: "% Bachelor's or Higher", order: 5 },
+    pct_carpool: { hidden: true } // remove from popup
+  }
+});
+```
+
+If you call `setupPlacesClickHandler` directly, pass the same config as `popupAttributeConfig`.
+
 ### Pre-load Specific States
 
 Instead of auto-detection:
