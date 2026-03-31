@@ -99,7 +99,7 @@ export const myCustomMapFixedSettings: ThemeSettings = {
 /**
  * Per-label-type font configuration.
  * 
- * Available fonts (from CDN at https://assest.storypath.studio/glyphs/):
+ * Available fonts (from CDN at https://assets.storypath.studio/glyphs/):
  * 
  * Noto Sans (default):
  *   - "Noto Sans Regular"

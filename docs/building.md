@@ -98,7 +98,7 @@ The build script uses two configurations:
 
 ```typescript
 const localConfig = {
-  glyphsBaseUrl: "https://data.storypath.studio",
+  glyphsBaseUrl: "https://assets.storypath.studio",
   glyphsPath: "glyphs",
   spriteBaseUrl: "http://localhost:8080",
   dataBaseUrl: "https://data.storypath.studio",
@@ -116,7 +116,7 @@ NODE_ENV=production npm run build:styles
 
 ```typescript
 const productionConfig = {
-  glyphsBaseUrl: "https://data.storypath.studio",
+  glyphsBaseUrl: "https://assets.storypath.studio",
   glyphsPath: "glyphs",
   spriteBaseUrl: "http://localhost:8080",  // Update for production
   dataBaseUrl: "https://data.storypath.studio",
@@ -132,7 +132,7 @@ For production, update `spriteBaseUrl` to your CDN or hosting URL.
 The main MapLibre style file. Contains:
 
 - `version`: MapLibre style spec version (8)
-- `sources`: Data sources (PMTiles URLs)
+- `sources`: Data sources (TileJSON URLs)
 - `sprite`: Sprite sheet URL
 - `glyphs`: Font glyph URL pattern
 - `layers`: Array of layer definitions
