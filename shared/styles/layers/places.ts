@@ -289,15 +289,11 @@ export function createPlacesLayers(theme: Theme): LayerSpecification[] {
   ];
 
   const pointLayerIds = [
-    { id: "places-points-lowzoom", layerName: "places" },
-    { id: "places-points-lowzoom-alt1", layerName: "points" },
-    { id: "places-points-lowzoom-alt2", layerName: "places_points" },
+    { id: "places-points-lowzoom", layerName: "places_points" },
   ];
 
   const clusterLabelLayerIds = [
-    { id: "places-cluster-labels-lowzoom", layerName: "places" },
-    { id: "places-cluster-labels-lowzoom-alt1", layerName: "points" },
-    { id: "places-cluster-labels-lowzoom-alt2", layerName: "places_points" },
+    { id: "places-cluster-labels-lowzoom", layerName: "places_points" },
   ];
 
   // Low-zoom point/cluster layers (starfield points) with fallback source-layer names

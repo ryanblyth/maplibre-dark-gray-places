@@ -26,7 +26,7 @@ The map uses a hybrid approach for assets:
 
 ### External Assets (loaded from CDN)
 
-- **Glyphs** (fonts) - `https://data.storypath.studio/glyphs/`
+- **Glyphs** (fonts) - `https://assest.storypath.studio/glyphs/`
 - **Starfield script** - `https://data.storypath.studio/js/maplibre-gl-starfield.js`
 - **PMTiles data** - Map data URLs in `style.json`
 
@@ -246,7 +246,7 @@ The map loads these assets from CDN:
 ### Glyphs (Fonts)
 
 ```
-https://data.storypath.studio/glyphs/{fontstack}/{range}.pbf
+https://assest.storypath.studio/glyphs/{fontstack}/{range}.pbf
 ```
 
 These are loaded on-demand as the map needs different character ranges.

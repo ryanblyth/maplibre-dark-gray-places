@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "build:styles": "tsx scripts/build-styles.ts",
+    "build:styles:local": "SPRITE_CDN=http://localhost:8080 npm run build:styles",
     "build:shields": "tsx scripts/build-shields.ts",
     "build:utils": "tsc --project tsconfig.browser.json",
     "build": "npm run build:utils && npm run build:styles",
     "serve": "node serve.js",
-    "dev": "npm run build && npm run serve"
+    "dev": "npm run build:styles:local && npm run serve",
+    "verify:tilejson": "node scripts/verify-tilejson.mjs",
+    "warm:cache": "node scripts/warm-cache.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

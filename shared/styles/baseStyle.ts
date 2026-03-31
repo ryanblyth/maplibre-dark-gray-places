@@ -41,7 +41,7 @@ export function createGlobalSources(config: BaseStyleConfig): Record<string, Sou
   return {
     world_labels: {
       type: "vector",
-      url: `pmtiles://${config.dataBaseUrl}/pmtiles/world-labels_z0-10.pmtiles`,
+      url: `${config.dataBaseUrl}/world-labels_z0-10.json`,
       minzoom: 0,
       maxzoom: 10,
     },
