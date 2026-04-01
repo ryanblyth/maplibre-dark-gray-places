@@ -27,6 +27,7 @@ The map uses a hybrid approach for assets:
 ### External Assets (loaded from CDN)
 
 - **Glyphs** (fonts) - `https://assets.storypath.studio/glyphs/`
+- **Starfield script** - `https://assets.storypath.studio/js/maplibre-gl-starfield.js`
 - **TileJSON data** - Map data URLs in `style.json`
 
 ## Deployment Steps
@@ -202,6 +203,7 @@ Enable gzip compression for:
   <div id="map"></div>
   
   <script src="https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.js"></script>
+  <script src="https://assets.storypath.studio/js/maplibre-gl-starfield.js"></script>
   <script src="./map-config.js"></script>
   <script>
     const map = new maplibregl.Map({
@@ -240,6 +242,14 @@ https://assets.storypath.studio/glyphs/{fontstack}/{range}.pbf
 ```
 
 These are loaded on-demand as the map needs different character ranges.
+
+### Starfield Script
+
+```
+https://assets.storypath.studio/js/maplibre-gl-starfield.js
+```
+
+Required for globe projection with starfield and glow effect.
 
 ### TileJSON Data
 

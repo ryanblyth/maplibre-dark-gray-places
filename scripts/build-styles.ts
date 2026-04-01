@@ -17,11 +17,13 @@ const projectRoot = join(__dirname, "..");
 /** Resolve style configuration from environment variables with sensible defaults */
 function resolveStyleConfig(): BaseStyleConfig {
   const dataCdn = process.env.DATA_CDN ?? "https://data.storypath.studio";
-  const assetsBase = process.env.ASSETS_BASE_URL ?? dataCdn;
   return {
     glyphsBaseUrl: process.env.GLYPHS_CDN ?? "https://assets.storypath.studio",
     glyphsPath: "glyphs",
-    spriteBaseUrl: process.env.SPRITE_CDN ?? assetsBase,
+    // Sprites: default path-relative to style.json (works on any host if layout matches). CDN override:
+    // SPRITE_CDN=https://assets.example.com npm run build:styles
+    spriteBaseUrl:
+      process.env.SPRITE_CDN ?? process.env.ASSETS_BASE_URL ?? "",
     spritePath: "sprites/basemap",
     dataBaseUrl: dataCdn,
   };
@@ -137,7 +139,11 @@ async function buildStyle(): Promise<void> {
   console.log("Building my-custom-map-fixed style...\n");
   
   const config = resolveStyleConfig();
-  console.log(`Using config: DATA_CDN=${config.dataBaseUrl} SPRITE=${config.spriteBaseUrl}/${config.spritePath}\n`);
+  const spriteLabel =
+    config.spriteBaseUrl && config.spriteBaseUrl.length > 0
+      ? `${config.spriteBaseUrl}/${config.spritePath}`
+      : (config.spritePath ?? "sprites/basemap");
+  console.log(`Using config: DATA_CDN=${config.dataBaseUrl} SPRITE=${spriteLabel}\n`);
   
   try {
     const style = createMyCustomMapFixedStyle(config) as Record<string, any>;
