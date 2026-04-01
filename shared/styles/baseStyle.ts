@@ -15,22 +15,22 @@ import type {
 
 /** Configuration options for base style */
 export interface BaseStyleConfig {
-  /** Base URL for glyph files (e.g., "http://localhost:8080" or "https://data.storypath.studio") */
+  /** Base URL for glyph files (e.g., "http://localhost:8080" or "https://assets.storypath.studio") */
   glyphsBaseUrl: string;
   /** Glyphs path relative to glyphsBaseUrl (e.g., "glyphs" or "shared/assets/glyphs"). Defaults to "shared/assets/glyphs" for local dev */
   glyphsPath?: string;
-  /** Base URL for sprite files (e.g., "http://localhost:8080") */
+  /** Base URL for sprite files. Use empty string for a path relative to the style JSON URL (e.g. sprites load from same host/path as style.json). */
   spriteBaseUrl: string;
   /** Sprite path relative to spriteBaseUrl (e.g., "basemaps/dark-blue/sprites/basemap"). Defaults to "shared/assets/sprites/basemap" for backward compatibility */
   spritePath?: string;
-  /** Base URL for PMTiles data (e.g., "https://data.storypath.studio") */
+  /** Base URL for tile data TileJSON endpoints (e.g., "https://data.storypath.studio") */
   dataBaseUrl: string;
 }
 
 /** Default configuration for local development */
 export const defaultConfig: BaseStyleConfig = {
   glyphsBaseUrl: "http://localhost:8080",
-  spriteBaseUrl: "http://localhost:8080",
+  spriteBaseUrl: "",
   dataBaseUrl: "https://data.storypath.studio",
 };
 
@@ -41,7 +41,7 @@ export function createGlobalSources(config: BaseStyleConfig): Record<string, Sou
   return {
     world_labels: {
       type: "vector",
-      url: `pmtiles://${config.dataBaseUrl}/pmtiles/world-labels_z0-10.pmtiles`,
+      url: `${config.dataBaseUrl}/world-labels_z0-10.json`,
       minzoom: 0,
       maxzoom: 10,
     },
@@ -58,14 +58,16 @@ export function createGlobalSources(config: BaseStyleConfig): Record<string, Sou
  */
 export function createBaseStyle(config: BaseStyleConfig = defaultConfig): StyleSpecification {
   // Use configurable sprite path, defaulting to shared location for backward compatibility
-  const spritePath = config.spritePath || 'shared/assets/sprites/basemap';
+  const spritePath = (config.spritePath || "shared/assets/sprites/basemap").replace(/^\/+/, "");
+  const spriteBase = (config.spriteBaseUrl ?? "").trim().replace(/\/+$/, "");
+  const sprite = spriteBase ? `${spriteBase}/${spritePath}` : spritePath;
   // Use configurable glyphs path, defaulting to shared/assets/glyphs for local dev
   const glyphsPath = config.glyphsPath || 'shared/assets/glyphs';
   return {
     version: 8,
     name: "Base Style",
     glyphs: `${config.glyphsBaseUrl}/${glyphsPath}/{fontstack}/{range}.pbf`,
-    sprite: `${config.spriteBaseUrl}/${spritePath}`,
+    sprite,
     sources: createGlobalSources(config),
     layers: [],
   };

@@ -14,23 +14,20 @@ import { formatJSON } from "./format-json.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = join(__dirname, "..");
 
-/** Configuration for production build */
-const productionConfig: BaseStyleConfig = {
-  glyphsBaseUrl: "https://data.storypath.studio",
-  glyphsPath: "glyphs",
-  spriteBaseUrl: "http://localhost:8080",
-  spritePath: "sprites/basemap",
-  dataBaseUrl: "https://data.storypath.studio",
-};
-
-/** Configuration for local development */
-const localConfig: BaseStyleConfig = {
-  glyphsBaseUrl: "https://data.storypath.studio",
-  glyphsPath: "glyphs",
-  spriteBaseUrl: "http://localhost:8080",
-  spritePath: "sprites/basemap",
-  dataBaseUrl: "https://data.storypath.studio",
-};
+/** Resolve style configuration from environment variables with sensible defaults */
+function resolveStyleConfig(): BaseStyleConfig {
+  const dataCdn = process.env.DATA_CDN ?? "https://data.storypath.studio";
+  return {
+    glyphsBaseUrl: process.env.GLYPHS_CDN ?? "https://assets.storypath.studio",
+    glyphsPath: "glyphs",
+    // Sprites: default path-relative to style.json (works on any host if layout matches). CDN override:
+    // SPRITE_CDN=https://assets.example.com npm run build:styles
+    spriteBaseUrl:
+      process.env.SPRITE_CDN ?? process.env.ASSETS_BASE_URL ?? "",
+    spritePath: "sprites/basemap",
+    dataBaseUrl: dataCdn,
+  };
+}
 
 function ensureDir(filePath: string): void {
   const dir = dirname(filePath);
@@ -115,14 +112,46 @@ window.mapBearing = ${bearing};${starfieldConfigSection}
   }
 }
 
+const TILEJSON_FIELDS = [
+  "tiles", "vector_layers", "minzoom", "maxzoom",
+  "attribution", "bounds",
+];
+
+async function inlineTileJsonSources(style: Record<string, any>): Promise<void> {
+  const sources = style.sources as Record<string, any>;
+  for (const [name, source] of Object.entries(sources)) {
+    if (typeof source.url !== "string") continue;
+    const url = source.url;
+    console.log(`  ↓ Inlining TileJSON for source "${name}": ${url}`);
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`TileJSON fetch failed for source "${name}" (${url}): HTTP ${res.status}`);
+    }
+    const tileJson = await res.json() as Record<string, unknown>;
+    for (const field of TILEJSON_FIELDS) {
+      if (field in tileJson) source[field] = tileJson[field];
+    }
+    delete source.url;
+  }
+}
+
 async function buildStyle(): Promise<void> {
   console.log("Building my-custom-map-fixed style...\n");
   
-  const config = process.env.NODE_ENV === "production" ? productionConfig : localConfig;
-  console.log(`Using ${process.env.NODE_ENV === "production" ? "production" : "development"} configuration\n`);
+  const config = resolveStyleConfig();
+  const spriteLabel =
+    config.spriteBaseUrl && config.spriteBaseUrl.length > 0
+      ? `${config.spriteBaseUrl}/${config.spritePath}`
+      : (config.spritePath ?? "sprites/basemap");
+  console.log(`Using config: DATA_CDN=${config.dataBaseUrl} SPRITE=${spriteLabel}\n`);
   
   try {
-    const style = createMyCustomMapFixedStyle(config);
+    const style = createMyCustomMapFixedStyle(config) as Record<string, any>;
+
+    console.log("Inlining TileJSON sources...");
+    await inlineTileJsonSources(style);
+    console.log("  ✓ TileJSON inlined\n");
+
     const outputPath = join(projectRoot, "style.generated.json");
     const styleJsonPath = join(projectRoot, "style.json");
     

@@ -26,9 +26,9 @@ The map uses a hybrid approach for assets:
 
 ### External Assets (loaded from CDN)
 
-- **Glyphs** (fonts) - `https://data.storypath.studio/glyphs/`
-- **Starfield script** - `https://data.storypath.studio/js/maplibre-gl-starfield.js`
-- **PMTiles data** - Map data URLs in `style.json`
+- **Glyphs** (fonts) - `https://assets.storypath.studio/glyphs/`
+- **Starfield script** - `https://assets.storypath.studio/js/maplibre-gl-starfield.js`
+- **TileJSON data** - Map data URLs in `style.json`
 
 ## Deployment Steps
 
@@ -48,7 +48,7 @@ If you're hosting sprites on a CDN, update the sprite URL in `scripts/build-styl
 
 ```typescript
 const productionConfig = {
-  glyphsBaseUrl: "https://data.storypath.studio",
+  glyphsBaseUrl: "https://assets.storypath.studio",
   glyphsPath: "glyphs",
   spriteBaseUrl: "https://your-cdn.com",  // Your CDN URL
   dataBaseUrl: "https://data.storypath.studio",
@@ -203,13 +203,9 @@ Enable gzip compression for:
   <div id="map"></div>
   
   <script src="https://unpkg.com/maplibre-gl@5.13.0/dist/maplibre-gl.js"></script>
-  <script src="https://unpkg.com/pmtiles@4.3.0/dist/pmtiles.js"></script>
-  <script src="https://data.storypath.studio/js/maplibre-gl-starfield.js"></script>
+  <script src="https://assets.storypath.studio/js/maplibre-gl-starfield.js"></script>
   <script src="./map-config.js"></script>
   <script>
-    const protocol = new pmtiles.Protocol();
-    maplibregl.addProtocol("pmtiles", protocol.tile);
-    
     const map = new maplibregl.Map({
       container: "map",
       style: "./style.json",
@@ -226,10 +222,6 @@ Enable gzip compression for:
 
 ```javascript
 import maplibregl from 'maplibre-gl';
-import * as pmtiles from 'pmtiles';
-
-const protocol = new pmtiles.Protocol();
-maplibregl.addProtocol('pmtiles', protocol.tile);
 
 const map = new maplibregl.Map({
   container: 'map',
@@ -246,7 +238,7 @@ The map loads these assets from CDN:
 ### Glyphs (Fonts)
 
 ```
-https://data.storypath.studio/glyphs/{fontstack}/{range}.pbf
+https://assets.storypath.studio/glyphs/{fontstack}/{range}.pbf
 ```
 
 These are loaded on-demand as the map needs different character ranges.
@@ -254,21 +246,23 @@ These are loaded on-demand as the map needs different character ranges.
 ### Starfield Script
 
 ```
-https://data.storypath.studio/js/maplibre-gl-starfield.js
+https://assets.storypath.studio/js/maplibre-gl-starfield.js
 ```
 
-Required for globe projection with starfield effect.
+Required for globe projection with starfield and glow effect.
 
-### PMTiles Data
+### TileJSON Data
 
-Map data sources are referenced in `style.json`:
+Map data sources are inlined into `style.json` at build time from TileJSON endpoints:
 
 ```json
 {
   "sources": {
     "world_low": {
       "type": "vector",
-      "url": "pmtiles://https://data.storypath.studio/pmtiles/world.pmtiles"
+      "tiles": ["https://data.storypath.studio/tiles/world/{z}/{x}/{y}.pbf"],
+      "minzoom": 0,
+      "maxzoom": 6
     }
   }
 }
@@ -297,7 +291,7 @@ Enable gzip/brotli compression for:
 
 ### 4. Lazy Load
 
-If the map isn't immediately visible, lazy load MapLibre and PMTiles libraries.
+If the map isn't immediately visible, lazy load the MapLibre library.
 
 ## Environment Variables
 
@@ -306,7 +300,7 @@ For different environments, you can use environment variables:
 ```typescript
 // scripts/build-styles.ts
 const productionConfig = {
-  glyphsBaseUrl: process.env.GLYPHS_CDN || "https://data.storypath.studio",
+  glyphsBaseUrl: process.env.GLYPHS_CDN || "https://assets.storypath.studio",
   spriteBaseUrl: process.env.SPRITE_CDN || "http://localhost:8080",
   // ...
 };
@@ -326,7 +320,7 @@ Monitor that all assets load correctly:
 - Style JSON
 - Sprites (check Network tab)
 - Glyphs (loaded on-demand)
-- PMTiles data
+- TileJSON data sources
 
 ### Error Tracking
 
@@ -359,7 +353,7 @@ map.on('error', (e) => {
 **Slow loading:**
 - Enable compression
 - Use CDN for assets
-- Check PMTiles URLs are reachable
+- Check TileJSON source URLs are reachable
 
 ## Security
 

@@ -119,31 +119,13 @@ export function createWaterLabelLayersFromBasemapSources(theme: Theme): LayerSpe
   const waterFont = theme.labelFonts?.water ?? theme.labelFonts?.default ?? theme.fonts.italic;
   
   return [
-    // World low zoom ocean labels
-    { id: "marine-label-world-watername-ocean", type: "symbol", source: "world_low", "source-layer": "water_name_ocean", minzoom: 1, maxzoom: 6.5, layout: { "text-field": ["coalesce", ["get", "name:en"], ["get", "name"], ["get", "name_int"], ""], "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 1, 14, 3, 18, 6, 24], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
-    
-    // Debug layer (magenta) - kept for consistency
-    { id: "marine-label-world-all-watername", type: "symbol", source: "world_low", "source-layer": "water_name", minzoom: 1, maxzoom: 6.5, layout: { "text-field": ["coalesce", ["get", "name:en"], ["get", "name"], ["get", "name_int"], ""], "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 1, 14, 3, 18, 6, 24], "symbol-placement": "point", "text-padding": 10 }, paint: { "text-color": "#ff00ff", "text-halo-color": "#ffffff", "text-halo-width": 2, "text-halo-blur": 1, "text-opacity": 1 } },
-    
-    // World low zoom water_name
-    { id: "marine-label-world-watername", type: "symbol", source: "world_low", "source-layer": "water_name", minzoom: 1, maxzoom: 6.5, filter: ["all", filters.hasName, hasClassFilter], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 1, 14, 3, 18, 6, 24], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
-    
-    // World low zoom place
+    // World low zoom — place layer only (world_low has no water_name; water_name labels come from world_labels)
     { id: "marine-label-world", type: "symbol", source: "world_low", "source-layer": "place", minzoom: 1, maxzoom: 6.5, filter: ["all", filters.hasName, filters.marineClass], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 1, 14, 3, 18, 6, 24], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
     
-    // Water labels
-    { id: "water-label-world-major", type: "symbol", source: "world_low", "source-layer": "water_name", minzoom: 2, maxzoom: 6.5, filter: ["all", filters.hasName], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 2, 12, 4, 14, 6, 18], "symbol-placement": "point", "text-padding": 8 }, paint: waterLabelPaintThin },
-    { id: "water-label-world", type: "symbol", source: "world_low", "source-layer": "water_name", minzoom: 4, maxzoom: 6.5, filter: ["all", filters.hasName, ["case", ["has", "rank"], [">", ["get", "rank"], 2], false]], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 4, 10, 6, 14], "symbol-placement": "point", "text-padding": 8 }, paint: waterLabelPaintThin },
-    
-    // World mid zoom
-    { id: "marine-label-world-mid-watername-ocean", type: "symbol", source: "world_mid", "source-layer": "water_name_ocean", minzoom: 6, filter: ["all", filters.hasName], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 6, 20, 8, 24, 10, 28], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
-    { id: "marine-label-world-mid-watername", type: "symbol", source: "world_mid", "source-layer": "water_name", minzoom: 6, filter: ["all", filters.hasName, hasClassFilter], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 6, 20, 8, 24, 10, 28], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
+    // World mid zoom — place layer only (world_mid has no water_name; water_name labels come from world_labels)
     { id: "marine-label-world-mid", type: "symbol", source: "world_mid", "source-layer": "place", minzoom: 6, filter: ["all", filters.hasName, filters.marineClass], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 6, 20, 8, 24, 10, 28], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
-    { id: "water-label-world-mid-major", type: "symbol", source: "world_mid", "source-layer": "water_name", minzoom: 6, filter: ["all", filters.hasName], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 6, 16, 8, 18, 10, 22], "symbol-placement": "point", "text-padding": 8 }, paint: waterLabelPaintThin },
-    { id: "water-label-world-mid", type: "symbol", source: "world_mid", "source-layer": "water_name", minzoom: 7, filter: ["all", ["has", "name"], ["case", ["has", "rank"], [">", ["get", "rank"], 3], false]], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 7, 12, 10, 16], "symbol-placement": "point", "text-padding": 8 }, paint: waterLabelPaintThin },
     
-    // US high zoom
-    { id: "marine-label-us-watername-ocean", type: "symbol", source: "us_high", "source-layer": "water_name_ocean", minzoom: 4, filter: ["all", filters.hasName], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 4, 16, 8, 20, 12, 26, 15, 32], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
+    // US high zoom (water_name_ocean does not exist in this source; ocean labels use water_name with class filter)
     { id: "marine-label-us-watername", type: "symbol", source: "us_high", "source-layer": "water_name", minzoom: 4, filter: ["all", filters.hasName, hasClassFilter], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 4, 16, 8, 20, 12, 26, 15, 32], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
     { id: "marine-label-us", type: "symbol", source: "us_high", "source-layer": "place", minzoom: 4, filter: ["all", filters.hasName, ["match", ["get", "class"], ["ocean", "sea", "gulf", "bay", "lake"], true, false]], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 4, 16, 8, 20, 12, 26, 15, 32], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
     { id: "water-label-us-place", type: "symbol", source: "us_high", "source-layer": "place", minzoom: 6, filter: ["all", filters.hasName, ["==", ["get", "class"], "lake"]], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 6, 14, 10, 18, 15, 24], "symbol-placement": "point", "text-padding": 8 }, paint: waterLabelPaintThin },
