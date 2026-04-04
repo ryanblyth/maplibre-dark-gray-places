@@ -2,16 +2,110 @@
  * Road label layers
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  FilterSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme } from "../../theme.js";
 import { createAbbreviatedTextField } from "../../baseStyle.js";
 
+function roadLabelTextSize(
+  z0: number,
+  s0: number,
+  z1: number,
+  s1: number,
+  z2: number,
+  s2: number
+): DataDrivenPropertyValueSpecification<number> {
+  return [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    z0,
+    s0,
+    z1,
+    s1,
+    z2,
+    s2,
+  ] as DataDrivenPropertyValueSpecification<number>;
+}
+
+function roadLabelTextSizeTwo(
+  z0: number,
+  s0: number,
+  z1: number,
+  s1: number
+): DataDrivenPropertyValueSpecification<number> {
+  return [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    z0,
+    s0,
+    z1,
+    s1,
+  ] as DataDrivenPropertyValueSpecification<number>;
+}
+
 export function createRoadLabelLayers(theme: Theme): LayerSpecification[] {
   const c = theme.colors;
-  const majorFilter = ["all", ["!=", ["get", "brunnel"], "tunnel"], ["!=", ["get", "brunnel"], "bridge"], ["match", ["get", "class"], ["motorway", "trunk", "primary"], true, false], ["has", "name"]];
-  const secondaryFilter = ["all", ["!=", ["get", "brunnel"], "tunnel"], ["!=", ["get", "brunnel"], "bridge"], ["==", ["get", "class"], "secondary"], ["has", "name"]];
-  const tertiaryFilter = ["all", ["!=", ["get", "brunnel"], "tunnel"], ["!=", ["get", "brunnel"], "bridge"], ["match", ["get", "class"], ["tertiary", "residential"], true, false], ["has", "name"]];
-  const otherFilter = ["all", ["!=", ["get", "brunnel"], "tunnel"], ["!=", ["get", "brunnel"], "bridge"], ["!", ["match", ["get", "class"], ["motorway", "trunk", "primary", "secondary", "tertiary", "residential"], true, false]], ["has", "name"]];
+  const majorFilter = [
+    "all",
+    ["!=", ["get", "brunnel"], "tunnel"],
+    ["!=", ["get", "brunnel"], "bridge"],
+    [
+      "match",
+      ["get", "class"],
+      ["motorway", "trunk", "primary"],
+      true,
+      false,
+    ],
+    ["has", "name"],
+  ] as FilterSpecification;
+  const secondaryFilter = [
+    "all",
+    ["!=", ["get", "brunnel"], "tunnel"],
+    ["!=", ["get", "brunnel"], "bridge"],
+    ["==", ["get", "class"], "secondary"],
+    ["has", "name"],
+  ] as FilterSpecification;
+  const tertiaryFilter = [
+    "all",
+    ["!=", ["get", "brunnel"], "tunnel"],
+    ["!=", ["get", "brunnel"], "bridge"],
+    [
+      "match",
+      ["get", "class"],
+      ["tertiary", "residential"],
+      true,
+      false,
+    ],
+    ["has", "name"],
+  ] as FilterSpecification;
+  const otherFilter = [
+    "all",
+    ["!=", ["get", "brunnel"], "tunnel"],
+    ["!=", ["get", "brunnel"], "bridge"],
+    [
+      "!",
+      [
+        "match",
+        ["get", "class"],
+        [
+          "motorway",
+          "trunk",
+          "primary",
+          "secondary",
+          "tertiary",
+          "residential",
+        ],
+        true,
+        false,
+      ],
+    ],
+    ["has", "name"],
+  ] as FilterSpecification;
   
   // Use theme-configured font for road labels, with fallback to default fonts
   const roadFont = theme.labelFonts?.road ?? theme.labelFonts?.default ?? theme.fonts.regular;
@@ -30,10 +124,10 @@ export function createRoadLabelLayers(theme: Theme): LayerSpecification[] {
   };
   
   return [
-    { id: "road-label-major", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 8, filter: majorFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": ["interpolate", ["linear"], ["zoom"], 8, 9, 12, 11, 15, 13] }, paint: { ...baseLabelPaint, "text-color": c.label.road.major.color, "text-opacity": c.label.road.major.opacity } },
-    { id: "road-label-secondary", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 10, filter: secondaryFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": ["interpolate", ["linear"], ["zoom"], 10, 8, 12, 10, 15, 12] }, paint: { ...baseLabelPaint, "text-color": c.label.road.secondary.color, "text-opacity": c.label.road.secondary.opacity } },
-    { id: "road-label-tertiary", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 12, filter: tertiaryFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": ["interpolate", ["linear"], ["zoom"], 12, 8, 15, 10] }, paint: { ...baseLabelPaint, "text-color": c.label.road.tertiary.color, "text-opacity": c.label.road.tertiary.opacity } },
-    { id: "road-label-other", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 14, filter: otherFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": ["interpolate", ["linear"], ["zoom"], 14, 7, 15, 8] }, paint: { ...baseLabelPaint, "text-color": c.label.road.other.color, "text-opacity": c.label.road.other.opacity } },
+    { id: "road-label-major", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 8, filter: majorFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": roadLabelTextSize(8, 9, 12, 11, 15, 13) }, paint: { ...baseLabelPaint, "text-color": c.label.road.major.color, "text-opacity": c.label.road.major.opacity } },
+    { id: "road-label-secondary", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 10, filter: secondaryFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": roadLabelTextSize(10, 8, 12, 10, 15, 12) }, paint: { ...baseLabelPaint, "text-color": c.label.road.secondary.color, "text-opacity": c.label.road.secondary.opacity } },
+    { id: "road-label-tertiary", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 12, filter: tertiaryFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": roadLabelTextSizeTwo(12, 8, 15, 10) }, paint: { ...baseLabelPaint, "text-color": c.label.road.tertiary.color, "text-opacity": c.label.road.tertiary.opacity } },
+    { id: "road-label-other", type: "symbol", source: "us_high", "source-layer": "transportation_name", minzoom: 14, filter: otherFilter, layout: { ...baseLabelLayout, "text-field": createAbbreviatedTextField(), "text-size": roadLabelTextSizeTwo(14, 7, 15, 8) }, paint: { ...baseLabelPaint, "text-color": c.label.road.other.color, "text-opacity": c.label.road.other.opacity } },
   ];
 }
 
@@ -57,9 +151,27 @@ export function createHighwayShieldLayers(theme: Theme): LayerSpecification[] {
   const stateHighwayConfig = shields?.stateHighway || { enabled: true, sprite: "shield-state", textColor: "#1a4d1a", minZoom: 8 };
   
   // Filter for roads that have a ref (route number)
-  const interstateFilter = ["all", ["has", "ref"], ["==", ["get", "network"], "us-interstate"]];
-  const usHighwayFilter = ["all", ["has", "ref"], ["==", ["get", "network"], "us-highway"]];
-  const stateHighwayFilter = ["all", ["has", "ref"], ["match", ["get", "network"], ["us-state", "US:US", "US"], true, false]];
+  const interstateFilter = [
+    "all",
+    ["has", "ref"],
+    ["==", ["get", "network"], "us-interstate"],
+  ] as FilterSpecification;
+  const usHighwayFilter = [
+    "all",
+    ["has", "ref"],
+    ["==", ["get", "network"], "us-highway"],
+  ] as FilterSpecification;
+  const stateHighwayFilter = [
+    "all",
+    ["has", "ref"],
+    [
+      "match",
+      ["get", "network"],
+      ["us-state", "US:US", "US"],
+      true,
+      false,
+    ],
+  ] as FilterSpecification;
   
   // Base layout shared by all shields (can be overridden per-shield)
   const baseShieldLayout = {
@@ -76,9 +188,29 @@ export function createHighwayShieldLayers(theme: Theme): LayerSpecification[] {
   };
   
   // Helper to build text-size interpolation from config [minZoom, minSize, maxZoom, maxSize]
-  const buildTextSize = (config?: [number, number, number, number]) => {
-    if (!config) return ["interpolate", ["linear"], ["zoom"], 6, 9, 14, 13];
-    return ["interpolate", ["linear"], ["zoom"], config[0], config[1], config[2], config[3]];
+  const buildTextSize = (
+    config?: [number, number, number, number]
+  ): DataDrivenPropertyValueSpecification<number> => {
+    if (!config) {
+      return [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        6,
+        9,
+        14,
+        13,
+      ] as DataDrivenPropertyValueSpecification<number>;
+    }
+    return [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      config[0],
+      config[1],
+      config[2],
+      config[3],
+    ] as DataDrivenPropertyValueSpecification<number>;
   };
   
   const layers: LayerSpecification[] = [];
@@ -97,7 +229,7 @@ export function createHighwayShieldLayers(theme: Theme): LayerSpecification[] {
         "icon-image": interstateConfig.sprite,
         "icon-text-fit-padding": interstateConfig.textPadding || [2, 4, 2, 4],
         "text-size": buildTextSize(interstateConfig.textSize),
-        "text-font": interstateConfig.textFont || theme.fonts.bold || theme.fonts.regular,
+        "text-font": interstateConfig.textFont || theme.fonts.semibold || theme.fonts.regular,
       }, 
       paint: { 
         "text-color": interstateConfig.textColor,
@@ -119,7 +251,7 @@ export function createHighwayShieldLayers(theme: Theme): LayerSpecification[] {
         "icon-image": usHighwayConfig.sprite,
         "icon-text-fit-padding": usHighwayConfig.textPadding || [2, 4, 2, 4],
         "text-size": buildTextSize(usHighwayConfig.textSize),
-        "text-font": usHighwayConfig.textFont || theme.fonts.bold || theme.fonts.regular,
+        "text-font": usHighwayConfig.textFont || theme.fonts.semibold || theme.fonts.regular,
       }, 
       paint: { 
         "text-color": usHighwayConfig.textColor,
@@ -141,7 +273,7 @@ export function createHighwayShieldLayers(theme: Theme): LayerSpecification[] {
         "icon-image": stateHighwayConfig.sprite,
         "icon-text-fit-padding": stateHighwayConfig.textPadding || [2, 4, 2, 4],
         "text-size": buildTextSize(stateHighwayConfig.textSize),
-        "text-font": stateHighwayConfig.textFont || theme.fonts.bold || theme.fonts.regular,
+        "text-font": stateHighwayConfig.textFont || theme.fonts.semibold || theme.fonts.regular,
       }, 
       paint: { 
         "text-color": stateHighwayConfig.textColor,

@@ -2,7 +2,12 @@
  * Places layers (incorporated places boundaries)
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  ExpressionSpecification,
+  FilterSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme, DensityColorRange, DensityColors } from "../theme.js";
 
 /**
@@ -45,20 +50,20 @@ function sortRangesByThreshold(ranges: DensityColorRange[]): DensityColorRange[]
  */
 function generateDensityStepForValue(
   densityColors: DensityColors,
-  densityValueExpression: any[]
-): any[] {
+  densityValueExpression: ExpressionSpecification
+): ExpressionSpecification {
   const sortedRanges = sortRangesByThreshold(densityColors.ranges);
-  const expression: any[] = [
+  const expression: (string | number | ExpressionSpecification)[] = [
     "step",
     ["coalesce", densityValueExpression, 0],
-    densityColors.defaultFillColor
+    densityColors.defaultFillColor,
   ];
 
   for (const range of sortedRanges) {
     expression.push(range.threshold, range.fillColor);
   }
 
-  return expression;
+  return expression as ExpressionSpecification;
 }
 
 /**
@@ -71,24 +76,23 @@ function generateDensityStepForValue(
 function generateDensityStepExpression(
   densityColors: DensityColors,
   isOutline: boolean = false
-): any[] {
+): ExpressionSpecification {
   const sortedRanges = sortRangesByThreshold(densityColors.ranges);
-  
-  // Start with the step expression structure
-  const expression: any[] = [
+
+  const expression: (string | number | ExpressionSpecification)[] = [
     "step",
-    ["feature-state", "pop_density_sqmi"]
+    ["feature-state", "pop_density_sqmi"],
   ];
-  
-  // Add default color (for values below first threshold)
+
   if (isOutline) {
-    const defaultColor = densityColors.defaultOutlineColor || darkenColor(densityColors.defaultFillColor);
+    const defaultColor =
+      densityColors.defaultOutlineColor ||
+      darkenColor(densityColors.defaultFillColor);
     expression.push(defaultColor);
   } else {
     expression.push(densityColors.defaultFillColor);
   }
-  
-  // Add threshold and color pairs
+
   for (const range of sortedRanges) {
     expression.push(range.threshold);
     if (isOutline) {
@@ -98,8 +102,8 @@ function generateDensityStepExpression(
       expression.push(range.fillColor);
     }
   }
-  
-  return expression;
+
+  return expression as ExpressionSpecification;
 }
 
 /**
@@ -191,102 +195,166 @@ export function createPlacesLayers(theme: Theme): LayerSpecification[] {
     [
       "/",
       ["coalesce", ["get", "pop_total"], 0],
-      ["/", ["max", ["coalesce", ["get", "ALAND"], 0.000001], 0.000001], 2589988.110336]
+      [
+        "/",
+        ["max", ["coalesce", ["get", "ALAND"], 0.000001], 0.000001],
+        2589988.110336,
+      ],
     ],
-    0
-  ];
-  
-  // Determine fill color expression based on density configuration
-  const fillColorExpression = places.densityColors
-    ? [
-        "case",
-        // Use density-based colors if available
-        ["!=", ["feature-state", "pop_density_sqmi"], null],
-        generateDensityStepExpression(places.densityColors, false),
-        // Fallback to theme color if no density data
-        places.fill.color
-      ]
-    : [
-        "case",
-        // Use density-based colors if available (fallback to hardcoded values)
-        ["!=", ["feature-state", "pop_density_sqmi"], null],
-        [
-          "step",
-          ["feature-state", "pop_density_sqmi"],
-          "#ecda9a",  // Default for < 100
-          100, "#efc47e",   // 100-300
-          300, "#f3ad6a",   // 300-1,000
-          1000, "#f7945d",  // 1,000-2,000
-          2000, "#f97b57",  // 2,000-5,000
-          5000, "#f66356",  // 5,000-10,000
-          10000, "#ee4d5a"  // 10,000-25,000
-        ],
-        // Fallback to theme color if no density data
-        places.fill.color
-      ];
+    0,
+  ] as ExpressionSpecification;
 
-  const pointFillColorExpression = places.densityColors
-    ? generateDensityStepForValue(places.densityColors, densityValueForPoints)
-    : [
-        "step",
-        densityValueForPoints,
-        "#ecda9a",  // Default for < 100
-        100, "#efc47e",
-        300, "#f3ad6a",
-        1000, "#f7945d",
-        2000, "#f97b57",
-        5000, "#f66356",
-        10000, "#ee4d5a"
-      ];
-  
-  // Determine outline color expression based on density configuration
-  const outlineColorExpression = places.densityColors
-    ? [
-        "case",
-        // Use density-based darker colors if available
-        ["!=", ["feature-state", "pop_density_sqmi"], null],
-        generateDensityStepExpression(places.densityColors, true),
-        // Fallback to theme color if no density data
-        places.outline.color
-      ]
-    : [
-        "case",
-        // Use density-based darker colors if available (fallback to hardcoded values)
-        ["!=", ["feature-state", "pop_density_sqmi"], null],
-        [
+  const fillColorExpression = (
+    places.densityColors
+      ? [
+          "case",
+          ["!=", ["feature-state", "pop_density_sqmi"], null],
+          generateDensityStepExpression(places.densityColors, false),
+          places.fill.color,
+        ]
+      : [
+          "case",
+          ["!=", ["feature-state", "pop_density_sqmi"], null],
+          [
+            "step",
+            ["feature-state", "pop_density_sqmi"],
+            "#ecda9a",
+            100,
+            "#efc47e",
+            300,
+            "#f3ad6a",
+            1000,
+            "#f7945d",
+            2000,
+            "#f97b57",
+            5000,
+            "#f66356",
+            10000,
+            "#ee4d5a",
+          ],
+          places.fill.color,
+        ]
+  ) as DataDrivenPropertyValueSpecification<string>;
+
+  const pointFillColorExpression = (
+    places.densityColors
+      ? generateDensityStepForValue(places.densityColors, densityValueForPoints)
+      : [
           "step",
-          ["feature-state", "pop_density_sqmi"],
-          "#c4b87a",  // Default for < 100 (darker #ecda9a)
-          100, "#c9a366",   // 100-300 (darker #efc47e)
-          300, "#c88a54",   // 300-1,000 (darker #f3ad6a)
-          1000, "#c7754a",  // 1,000-2,000 (darker #f7945d)
-          2000, "#c86246",  // 2,000-5,000 (darker #f97b57)
-          5000, "#c44e45",  // 5,000-10,000 (darker #f66356)
-          10000, "#c03d48"  // 10,000-25,000 (darker #ee4d5a)
-        ],
-        // Fallback to theme color if no density data
-        places.outline.color
-      ];
-  
-  // Opacity crossfade for polygons (fade in from z5 to z6.5)
-  const polygonZoomRamp = [
+          densityValueForPoints,
+          "#ecda9a",
+          100,
+          "#efc47e",
+          300,
+          "#f3ad6a",
+          1000,
+          "#f7945d",
+          2000,
+          "#f97b57",
+          5000,
+          "#f66356",
+          10000,
+          "#ee4d5a",
+        ]
+  ) as DataDrivenPropertyValueSpecification<string>;
+
+  const outlineColorExpression = (
+    places.densityColors
+      ? [
+          "case",
+          ["!=", ["feature-state", "pop_density_sqmi"], null],
+          generateDensityStepExpression(places.densityColors, true),
+          places.outline.color,
+        ]
+      : [
+          "case",
+          ["!=", ["feature-state", "pop_density_sqmi"], null],
+          [
+            "step",
+            ["feature-state", "pop_density_sqmi"],
+            "#c4b87a",
+            100,
+            "#c9a366",
+            300,
+            "#c88a54",
+            1000,
+            "#c7754a",
+            2000,
+            "#c86246",
+            5000,
+            "#c44e45",
+            10000,
+            "#c03d48",
+          ],
+          places.outline.color,
+        ]
+  ) as DataDrivenPropertyValueSpecification<string>;
+
+  const placesFillOpacity = [
     "interpolate",
     ["linear"],
     ["zoom"],
-    5, 0,
-    6.5, places.fill.opacity ?? 0.35,
-    13, places.fill.opacity ?? 0.35
-  ];
-
-  // Opacity crossfade for outlines (stay subtle at low zoom, full by 6.5+)
-  const outlineZoomRamp = [
-    "interpolate",
-    ["linear"],
-    ["zoom"],
-    5, 0.1,
-    6.5, places.outline.opacity ?? 0.6,
-    13, places.outline.opacity ?? 0.6
-  ];
+    5,
+    0,
+    6.5,
+    [
+      "*",
+      places.fill.opacity ?? 0.35,
+      [
+        "+",
+        1.0,
+        [
+          "case",
+          ["!=", ["feature-state", "pop_total"], null],
+          [
+            "interpolate",
+            ["linear"],
+            ["feature-state", "pop_total"],
+            0,
+            0,
+            10000,
+            0.05,
+            50000,
+            0.1,
+            100000,
+            0.15,
+            500000,
+            0.2,
+          ],
+          0,
+        ],
+      ],
+    ],
+    13,
+    [
+      "*",
+      places.fill.opacity ?? 0.35,
+      [
+        "+",
+        1.0,
+        [
+          "case",
+          ["!=", ["feature-state", "pop_total"], null],
+          [
+            "interpolate",
+            ["linear"],
+            ["feature-state", "pop_total"],
+            0,
+            0,
+            10000,
+            0.05,
+            50000,
+            0.1,
+            100000,
+            0.15,
+            500000,
+            0.2,
+          ],
+          0,
+        ],
+      ],
+    ],
+  ] as DataDrivenPropertyValueSpecification<number>;
 
   const pointLayerIds = [
     { id: "places-points-lowzoom", layerName: "places_points" },
@@ -307,33 +375,46 @@ export function createPlacesLayers(theme: Theme): LayerSpecification[] {
       const strokeBreaks = getZoomBreaks(strokeStops, [0, 6.5, 24]);
       const opacityBreaks = getZoomBreaks(opacityStops, [0, 5, 6.5, 24]);
 
-      const radiusInterpolate: any[] = ["interpolate", ["linear"], ["zoom"]];
-      for (const z of radiusBreaks) {
-        radiusInterpolate.push(z, [
-          "case",
-          ["==", ["coalesce", ["get", "cluster"], false], true],
+      const radiusInterpolate = [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        ...radiusBreaks.flatMap((z) => [
+          z,
           [
-            "interpolate",
-            ["linear"],
-            ["sqrt", ["coalesce", ["get", "point_count"], 1]],
-            1, 4,
-            5, 8,
-            25, 14,
-            100, 22
-          ],
-          valueAtZoom(radiusStops, 3, z)
-        ]);
-      }
+            "case",
+            ["==", ["coalesce", ["get", "cluster"], false], true],
+            [
+              "interpolate",
+              ["linear"],
+              ["sqrt", ["coalesce", ["get", "point_count"], 1]],
+              1,
+              4,
+              5,
+              8,
+              25,
+              14,
+              100,
+              22,
+            ],
+            valueAtZoom(radiusStops, 3, z),
+          ] as ExpressionSpecification,
+        ]),
+      ] as DataDrivenPropertyValueSpecification<number>;
 
-      const strokeInterpolate: any[] = ["interpolate", ["linear"], ["zoom"]];
-      for (const z of strokeBreaks) {
-        strokeInterpolate.push(z, valueAtZoom(strokeStops, 0.25, z));
-      }
+      const strokeInterpolate = [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        ...strokeBreaks.flatMap((z) => [z, valueAtZoom(strokeStops, 0.25, z)]),
+      ] as DataDrivenPropertyValueSpecification<number>;
 
-      const opacityInterpolate: any[] = ["interpolate", ["linear"], ["zoom"]];
-      for (const z of opacityBreaks) {
-        opacityInterpolate.push(z, valueAtZoom(opacityStops, 1, z));
-      }
+      const opacityInterpolate = [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        ...opacityBreaks.flatMap((z) => [z, valueAtZoom(opacityStops, 1, z)]),
+      ] as DataDrivenPropertyValueSpecification<number>;
 
       layers.push({
         id: entry.id,
@@ -363,11 +444,29 @@ export function createPlacesLayers(theme: Theme): LayerSpecification[] {
         "source-layer": entry.layerName,
         minzoom: 2.5,
         maxzoom: 5.5,
-        filter: ["==", ["coalesce", ["get", "cluster"], false], true],
+        filter: [
+          "==",
+          ["coalesce", ["get", "cluster"], false],
+          true,
+        ] as FilterSpecification,
         layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-size": ["interpolate", ["linear"], ["zoom"], 2.5, 10, 5.5, 14],
-          "text-font": theme.labelFonts?.place ?? theme.labelFonts?.default ?? theme.fonts.regular
+          "text-field": [
+            "get",
+            "point_count_abbreviated",
+          ] as ExpressionSpecification,
+          "text-size": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            2.5,
+            10,
+            5.5,
+            14,
+          ] as DataDrivenPropertyValueSpecification<number>,
+          "text-font":
+            theme.labelFonts?.place ??
+            theme.labelFonts?.default ??
+            theme.fonts.regular,
         },
         paint: {
           "text-color": labelColor,
@@ -377,10 +476,12 @@ export function createPlacesLayers(theme: Theme): LayerSpecification[] {
             "interpolate",
             ["linear"],
             ["zoom"],
-            2.5, 0.9,
-            5.5, 0
-          ]
-        }
+            2.5,
+            0.9,
+            5.5,
+            0,
+          ] as DataDrivenPropertyValueSpecification<number>,
+        },
       });
     }
   }
@@ -396,58 +497,7 @@ export function createPlacesLayers(theme: Theme): LayerSpecification[] {
       filter: ["all", ["has", "GEOID"]],
       paint: {
         "fill-color": fillColorExpression,
-        "fill-opacity": [
-          "interpolate",
-          ["linear"],
-          ["zoom"],
-          5, 0,
-          6.5, [
-            "*",
-            places.fill.opacity ?? 0.35,
-            [
-              "+",
-              1.0,
-              [
-                "case",
-                ["!=", ["feature-state", "pop_total"], null],
-                [
-                  "interpolate",
-                  ["linear"],
-                  ["feature-state", "pop_total"],
-                  0, 0,
-                  10000, 0.05,
-                  50000, 0.1,
-                  100000, 0.15,
-                  500000, 0.2
-                ],
-                0
-              ]
-            ]
-          ],
-          13, [
-            "*",
-            places.fill.opacity ?? 0.35,
-            [
-              "+",
-              1.0,
-              [
-                "case",
-                ["!=", ["feature-state", "pop_total"], null],
-                [
-                  "interpolate",
-                  ["linear"],
-                  ["feature-state", "pop_total"],
-                  0, 0,
-                  10000, 0.05,
-                  50000, 0.1,
-                  100000, 0.15,
-                  500000, 0.2
-                ],
-                0
-              ]
-            ]
-          ]
-        ],
+        "fill-opacity": placesFillOpacity,
         "fill-antialias": false,
       }
     });
@@ -466,18 +516,24 @@ export function createPlacesLayers(theme: Theme): LayerSpecification[] {
           "interpolate",
           ["linear"],
           ["zoom"],
-          5, places.outline.width.z5 ?? 0.5,
-          10, places.outline.width.z10 ?? 1.0,
-          15, places.outline.width.z15 ?? 1.5
-        ],
+          5,
+          places.outline.width.z5 ?? 0.5,
+          10,
+          places.outline.width.z10 ?? 1.0,
+          15,
+          places.outline.width.z15 ?? 1.5,
+        ] as DataDrivenPropertyValueSpecification<number>,
         "line-opacity": [
           "interpolate",
           ["linear"],
           ["zoom"],
-          5, 0.1,
-          6.5, places.outline.opacity ?? 0.6,
-          13, places.outline.opacity ?? 0.6
-        ],  // Crossfade outlines in from low zooms
+          5,
+          0.1,
+          6.5,
+          places.outline.opacity ?? 0.6,
+          13,
+          places.outline.opacity ?? 0.6,
+        ] as DataDrivenPropertyValueSpecification<number>,
       }
     });
   }

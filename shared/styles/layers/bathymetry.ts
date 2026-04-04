@@ -2,7 +2,10 @@
  * Bathymetry layers (ocean depth visualization)
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme } from "../theme.js";
 
 /**
@@ -146,7 +149,7 @@ export function createBathymetryLayers(theme: Theme): LayerSpecification[] {
   }
   
   // Create color stops array for MapLibre expression
-  const colorStops: unknown[] = [];
+  const colorStops: (number | string)[] = [];
   for (let i = 0; i < depthStops.length; i++) {
     colorStops.push(depthStops[i]);
     colorStops.push(ramp[i]);
@@ -255,12 +258,12 @@ export function createBathymetryLayers(theme: Theme): LayerSpecification[] {
               "case",
               [">=", ["get", "depth"], 0],
               ["get", "depth"],
-              ["*", ["get", "depth"], -1]
+              ["*", ["get", "depth"], -1],
             ],
-            0  // Fallback if depth property doesn't exist
+            0,
           ],
-          ...colorStops  // Using theme-based colors
-        ],
+          ...colorStops,
+        ] as DataDrivenPropertyValueSpecification<string>,
         "fill-opacity": [
           "interpolate",
           ["linear"],

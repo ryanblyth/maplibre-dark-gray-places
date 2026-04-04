@@ -2,7 +2,10 @@
  * Road layers (world, US, tunnels, bridges)
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme } from "../theme.js";
 import { 
   roadColorExpr, 
@@ -20,7 +23,10 @@ import {
 import type { RoadClassWidths } from "../theme.js";
 
 /** Helper to get road width expression based on theme settings */
-function getRoadWidthExpr(widths: RoadClassWidths, theme: Theme): unknown {
+function getRoadWidthExpr(
+  widths: RoadClassWidths,
+  theme: Theme
+): DataDrivenPropertyValueSpecification<number> {
   if (theme.settings?.realWorldScale) {
     const minZoom = theme.settings.realWorldScaleMinZoom ?? 15;
     return roadWidthExprRealWorld(widths, minZoom);
@@ -30,7 +36,10 @@ function getRoadWidthExpr(widths: RoadClassWidths, theme: Theme): unknown {
 
 // Casing width helper - currently uses fixed scaling (not real-world)
 // Real-world casing scaling can be revisited in the future if needed
-function getRoadCasingWidthExpr(widths: RoadClassWidths, _theme: Theme): unknown {
+function getRoadCasingWidthExpr(
+  widths: RoadClassWidths,
+  _theme: Theme
+): DataDrivenPropertyValueSpecification<number> {
   return roadCasingWidthExpr(widths);
 }
 
