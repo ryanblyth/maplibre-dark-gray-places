@@ -4,10 +4,27 @@
  * Displays icons for various POI categories at zoom 12+
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme, ThemePOIs } from "../../theme.js";
 import { createTextField } from "../../baseStyle.js";
 import { filters } from "../expressions.js";
+
+function poiDefaultTextSize(): DataDrivenPropertyValueSpecification<number> {
+  return [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    12,
+    10,
+    14,
+    12,
+    16,
+    14,
+  ] as DataDrivenPropertyValueSpecification<number>;
+}
 
 /**
  * Creates POI icon layers for various categories
@@ -58,9 +75,9 @@ export function createPOILayers(theme: Theme): LayerSpecification[] {
     "icon-ignore-placement": false,
     "text-field": createTextField(),
     "text-font": poiFont,
-    "text-size": ["interpolate", ["linear"], ["zoom"], 12, 10, 14, 12, 16, 14],
-    "text-offset": [0, 1.2],
-    "text-anchor": "top",
+    "text-size": poiDefaultTextSize(),
+    "text-offset": [0, 1.2] as [number, number],
+    "text-anchor": "top" as const,
     "text-optional": true,
     "text-allow-overlap": false,
     "symbol-placement": "point" as const,
@@ -730,8 +747,8 @@ export function createPOILayers(theme: Theme): LayerSpecification[] {
           "text-field": createTextField(),
           "text-font": poiFont,
           "text-size": ["interpolate", ["linear"], ["zoom"], 14.5, 10, 15, 12, 16, 14],
-          "text-offset": [0, 1.2],
-          "text-anchor": "top",
+          "text-offset": [0, 1.2] as [number, number],
+          "text-anchor": "top" as const,
           "text-optional": true,
           "text-allow-overlap": false,
           "symbol-placement": "point" as const,
@@ -793,8 +810,8 @@ export function createPOILayers(theme: Theme): LayerSpecification[] {
           "text-field": createTextField(),
           "text-font": poiFont,
           "text-size": ["interpolate", ["linear"], ["zoom"], 15, 9, 16, 12],
-          "text-offset": [0, 1.2],
-          "text-anchor": "top",
+          "text-offset": [0, 1.2] as [number, number],
+          "text-anchor": "top" as const,
           "text-optional": true,
           "text-allow-overlap": false,
           "symbol-placement": "point" as const,

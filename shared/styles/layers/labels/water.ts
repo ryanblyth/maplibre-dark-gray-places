@@ -2,7 +2,12 @@
  * Water label layers (marine, water bodies, waterways)
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  ExpressionSpecification,
+  FilterSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme } from "../../theme.js";
 import { createTextField } from "../../baseStyle.js";
 import { filters } from "../expressions.js";
@@ -12,7 +17,7 @@ import { filters } from "../expressions.js";
 // ============================================================================
 
 /** Complex text-size expression for water_name labels */
-function createWaterNameSizeExpression(): unknown {
+function createWaterNameSizeExpression(): DataDrivenPropertyValueSpecification<number> {
   const sizeAtZoom = (baseSize: number) => [
     "let", "name", ["coalesce", ["get", "name:en"], ["get", "name"], ""],
     ["case",
@@ -39,11 +44,21 @@ function createWaterNameSizeExpression(): unknown {
     ]
   ];
   
-  return ["interpolate", ["linear"], ["zoom"], 4, sizeAtZoom(7), 6, sizeAtZoom(13), 10, sizeAtZoom(18)];
+  return [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    4,
+    sizeAtZoom(7),
+    6,
+    sizeAtZoom(13),
+    10,
+    sizeAtZoom(18),
+  ] as unknown as DataDrivenPropertyValueSpecification<number>;
 }
 
 /** Complex text-size expression for US major water labels */
-function createUSMajorWaterSizeExpression(): unknown {
+function createUSMajorWaterSizeExpression(): DataDrivenPropertyValueSpecification<number> {
   const sizeExpr = (pondSize: number, reservoirSize: number, defaultSize: number, rankSizes: number[]) => [
     "let", "name", ["coalesce", ["get", "name:en"], ["get", "name"], ""],
     ["case",
@@ -71,12 +86,19 @@ function createUSMajorWaterSizeExpression(): unknown {
     ]
   ];
   
-  return ["interpolate", ["linear"], ["zoom"],
-    6, sizeExpr(6, 11, 10, [16, 14, 12, 10, 8]),
-    10, sizeExpr(6, 14, 13, [22, 19, 16, 13, 10]),
-    12, sizeExpr(7, 18, 17, [26, 23, 20, 17, 13]),
-    15, sizeExpr(8, 19, 18, [30, 26, 22, 18, 14])
-  ];
+  return [
+    "interpolate",
+    ["linear"],
+    ["zoom"],
+    6,
+    sizeExpr(6, 11, 10, [16, 14, 12, 10, 8]),
+    10,
+    sizeExpr(6, 14, 13, [22, 19, 16, 13, 10]),
+    12,
+    sizeExpr(7, 18, 17, [26, 23, 20, 17, 13]),
+    15,
+    sizeExpr(8, 19, 18, [30, 26, 22, 18, 14]),
+  ] as unknown as DataDrivenPropertyValueSpecification<number>;
 }
 
 // ============================================================================
@@ -113,7 +135,12 @@ export function createWaterLabelLayersFromBasemapSources(theme: Theme): LayerSpe
   const c = theme.colors;
   const waterLabelPaint = { "text-color": c.label.water.color, "text-halo-color": c.label.water.halo, "text-halo-width": 2, "text-halo-blur": 1, "text-opacity": 0.9 };
   const waterLabelPaintThin = { ...waterLabelPaint, "text-halo-width": 1.5 };
-  const hasClassFilter = ["case", ["has", "class"], ["match", ["get", "class"], ["ocean", "sea", "gulf", "bay"], true, false], true];
+  const hasClassFilter = [
+    "case",
+    ["has", "class"],
+    ["match", ["get", "class"], ["ocean", "sea", "gulf", "bay"], true, false],
+    true,
+  ] as FilterSpecification;
   
   // Use theme-configured font for water labels, with fallback to italic
   const waterFont = theme.labelFonts?.water ?? theme.labelFonts?.default ?? theme.fonts.italic;
@@ -126,7 +153,7 @@ export function createWaterLabelLayersFromBasemapSources(theme: Theme): LayerSpe
     { id: "marine-label-world-mid", type: "symbol", source: "world_mid", "source-layer": "place", minzoom: 6, filter: ["all", filters.hasName, filters.marineClass], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 6, 20, 8, 24, 10, 28], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
     
     // US high zoom (water_name_ocean does not exist in this source; ocean labels use water_name with class filter)
-    { id: "marine-label-us-watername", type: "symbol", source: "us_high", "source-layer": "water_name", minzoom: 4, filter: ["all", filters.hasName, hasClassFilter], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 4, 16, 8, 20, 12, 26, 15, 32], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
+    { id: "marine-label-us-watername", type: "symbol", source: "us_high", "source-layer": "water_name", minzoom: 4, filter: ["all", filters.hasName, hasClassFilter] as FilterSpecification, layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 4, 16, 8, 20, 12, 26, 15, 32], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
     { id: "marine-label-us", type: "symbol", source: "us_high", "source-layer": "place", minzoom: 4, filter: ["all", filters.hasName, ["match", ["get", "class"], ["ocean", "sea", "gulf", "bay", "lake"], true, false]], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 4, 16, 8, 20, 12, 26, 15, 32], "symbol-placement": "point", "text-padding": 10 }, paint: waterLabelPaint },
     { id: "water-label-us-place", type: "symbol", source: "us_high", "source-layer": "place", minzoom: 6, filter: ["all", filters.hasName, ["==", ["get", "class"], "lake"]], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": ["interpolate", ["linear"], ["zoom"], 6, 14, 10, 18, 15, 24], "symbol-placement": "point", "text-padding": 8 }, paint: waterLabelPaintThin },
     { id: "water-label-us-major", type: "symbol", source: "us_high", "source-layer": "water_name", minzoom: 6, filter: ["all", filters.hasName, ["case", ["has", "rank"], ["<=", ["get", "rank"], 4], true]], layout: { "text-field": createTextField(), "text-font": waterFont, "text-size": createUSMajorWaterSizeExpression(), "symbol-placement": "point", "text-padding": 8 }, paint: waterLabelPaintThin },
@@ -153,8 +180,27 @@ export function createWaterwayLabelLayers(theme: Theme): LayerSpecification[] {
     "symbol-spacing": 200 
   };
   
-  const sizeByClass = (river: number, canal: number, stream: number, ditch: number) => 
-    ["match", ["get", "class"], "river", river, "canal", canal, "stream", stream, "ditch", ditch, "drain", ditch, stream];
+  const sizeByClass = (
+    river: number,
+    canal: number,
+    stream: number,
+    ditch: number
+  ): ExpressionSpecification =>
+    [
+      "match",
+      ["get", "class"],
+      "river",
+      river,
+      "canal",
+      canal,
+      "stream",
+      stream,
+      "ditch",
+      ditch,
+      "drain",
+      ditch,
+      stream,
+    ] as ExpressionSpecification;
   
   return [
     { id: "waterway-label-world", type: "symbol", source: "world_low", "source-layer": "waterway", minzoom: 6, maxzoom: 6.5, filter: ["all", filters.hasName], layout: { ...baseLayout, "text-field": createTextField(), "text-size": ["interpolate", ["linear"], ["zoom"], 6, sizeByClass(10, 8, 7, 6), 6.5, sizeByClass(12, 10, 8, 7)] }, paint: waterwayLabelPaint },

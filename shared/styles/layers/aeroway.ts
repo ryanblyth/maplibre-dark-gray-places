@@ -2,7 +2,10 @@
  * Aeroway layers (airports, runways, aprons, taxiways, helipads)
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme } from "../theme.js";
 import { createTextField } from "../baseStyle.js";
 
@@ -54,8 +57,12 @@ export function createAerowayLayers(theme: Theme): LayerSpecification[] {
   const labelOpacity = aeroway.label?.opacity ?? 0.9;
   
   // Helper to create label size expression
-  const getLabelSize = (size: number | { min: number; max: number } | undefined, defaultMin: number, defaultMax: number): unknown => {
-    if (typeof size === 'number') {
+  const getLabelSize = (
+    size: number | { min: number; max: number } | undefined,
+    defaultMin: number,
+    defaultMax: number
+  ): DataDrivenPropertyValueSpecification<number> => {
+    if (typeof size === "number") {
       return size;
     }
     if (size) {
@@ -63,17 +70,21 @@ export function createAerowayLayers(theme: Theme): LayerSpecification[] {
         "interpolate",
         ["linear"],
         ["zoom"],
-        8, size.min,
-        13, size.max,
-      ];
+        8,
+        size.min,
+        13,
+        size.max,
+      ] as DataDrivenPropertyValueSpecification<number>;
     }
     return [
       "interpolate",
       ["linear"],
       ["zoom"],
-      8, defaultMin,
-      13, defaultMax,
-    ];
+      8,
+      defaultMin,
+      13,
+      defaultMax,
+    ] as DataDrivenPropertyValueSpecification<number>;
   };
   
   const majorLabelSize = getLabelSize(aeroway.label?.majorSize, 10, 12);

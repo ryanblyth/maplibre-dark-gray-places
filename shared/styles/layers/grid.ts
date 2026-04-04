@@ -10,7 +10,12 @@
  * PMTiles URL: pmtiles://{dataBaseUrl}/pmtiles/graticules.pmtiles
  */
 
-import type { LayerSpecification } from "maplibre-gl";
+import type {
+  DataDrivenPropertyValueSpecification,
+  ExpressionSpecification,
+  FilterSpecification,
+  LayerSpecification,
+} from "maplibre-gl";
 import type { Theme } from "../theme.js";
 
 // Default values
@@ -31,8 +36,8 @@ function createWidthExpression(
   width: number | { min: number; max: number } | undefined,
   gridMinZoom: number,
   gridMaxZoom: number
-): unknown {
-  if (typeof width === 'number') {
+): DataDrivenPropertyValueSpecification<number> {
+  if (typeof width === "number") {
     return width;
   }
   if (width) {
@@ -40,17 +45,21 @@ function createWidthExpression(
       "interpolate",
       ["linear"],
       ["zoom"],
-      gridMinZoom, width.min,
-      gridMaxZoom, width.max
-    ];
+      gridMinZoom,
+      width.min,
+      gridMaxZoom,
+      width.max,
+    ] as DataDrivenPropertyValueSpecification<number>;
   }
   return [
     "interpolate",
     ["linear"],
     ["zoom"],
-    gridMinZoom, 0.5,
-    gridMaxZoom, 1.0
-  ];
+    gridMinZoom,
+    0.5,
+    gridMaxZoom,
+    1.0,
+  ] as DataDrivenPropertyValueSpecification<number>;
 }
 
 /**
@@ -60,8 +69,8 @@ function createLabelSizeExpression(
   size: number | { min: number; max: number } | undefined,
   labelMinZoom: number,
   gridMaxZoom: number
-): unknown {
-  if (typeof size === 'number') {
+): DataDrivenPropertyValueSpecification<number> {
+  if (typeof size === "number") {
     return size;
   }
   if (size) {
@@ -69,33 +78,52 @@ function createLabelSizeExpression(
       "interpolate",
       ["linear"],
       ["zoom"],
-      labelMinZoom, size.min,
-      gridMaxZoom, size.max
-    ];
+      labelMinZoom,
+      size.min,
+      gridMaxZoom,
+      size.max,
+    ] as DataDrivenPropertyValueSpecification<number>;
   }
   return [
     "interpolate",
     ["linear"],
     ["zoom"],
-    labelMinZoom, DEFAULT_LABEL_SIZE.min,
-    gridMaxZoom, DEFAULT_LABEL_SIZE.max
-  ];
+    labelMinZoom,
+    DEFAULT_LABEL_SIZE.min,
+    gridMaxZoom,
+    DEFAULT_LABEL_SIZE.max,
+  ] as DataDrivenPropertyValueSpecification<number>;
 }
 
 /**
  * Creates a label field expression for coordinate display
  */
-function createLabelField(direction: "lat" | "lon"): unknown {
-  const suffix = direction === "lat" 
-    ? ["case", [">", ["get", "value"], 0], "N", ["<", ["get", "value"], 0], "S", "°"]
-    : ["case", [">", ["get", "value"], 0], "E", ["<", ["get", "value"], 0], "W", "°"];
-  
+function createLabelField(direction: "lat" | "lon"): ExpressionSpecification {
+  const suffix =
+    direction === "lat"
+      ? ([
+          "case",
+          [">", ["get", "value"], 0],
+          "N",
+          ["<", ["get", "value"], 0],
+          "S",
+          "°",
+        ] as ExpressionSpecification)
+      : ([
+          "case",
+          [">", ["get", "value"], 0],
+          "E",
+          ["<", ["get", "value"], 0],
+          "W",
+          "°",
+        ] as ExpressionSpecification);
+
   return [
     "concat",
     ["to-string", ["abs", ["get", "value"]]],
     "°",
-    suffix
-  ];
+    suffix,
+  ] as ExpressionSpecification;
 }
 
 /**
@@ -131,13 +159,13 @@ export function createGridLayers(theme: Theme): LayerSpecification[] {
     const lineWidth = createWidthExpression(config.width, gridMinZoom, gridMaxZoom);
     
     // Build filter: kind + step interval
-    const filter: unknown[] = [
-      "all",
-      ["==", ["get", "kind"], kind]
-    ];
-    if (interval) {
-      filter.push(["==", ["get", "step"], String(interval)]);
-    }
+    const filter: FilterSpecification = interval
+      ? ([
+          "all",
+          ["==", ["get", "kind"], kind],
+          ["==", ["get", "step"], String(interval)],
+        ] as FilterSpecification)
+      : (["==", ["get", "kind"], kind] as FilterSpecification);
     
     const layerId = kind === "parallel" ? "grid-latitude" : "grid-longitude";
     
