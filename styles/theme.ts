@@ -485,7 +485,7 @@ export const myCustomMapFixedStarfield = {
 
 export const myCustomMapFixedPOIs: ThemePOIs = {
   /** Whether to show POIs at all */
-  enabled: true,
+  enabled: false,
   
   /** Global minimum zoom for all POIs */
   minZoom: 12,
@@ -672,7 +672,7 @@ export const myCustomMapFixedIce = {
 
 export const myCustomMapFixedHillshade = {
   /** Whether to show hillshade at all */
-  enabled: true,
+  enabled: false,
   
   /** Minimum zoom level to show hillshade (TileJSON minzoom is 1; z0 has no tiles) */
   minZoom: 1,
