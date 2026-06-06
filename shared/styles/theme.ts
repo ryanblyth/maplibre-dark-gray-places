@@ -1037,6 +1037,63 @@ export interface ThemePlaces {
 }
 
 // ============================================================================
+// WORLD LOW-ZOOM LAND TYPE
+// ============================================================================
+
+/**
+ * Low-zoom land configuration for globe projection (z0–~5.5).
+ * Provides colors for landcover and landuse that read clearly against ocean
+ * at low zoom levels before per-tile polygon data is available.
+ */
+export interface ThemeWorldLowZoomLand {
+  /** Zoom level at which the low-zoom colors fully blend into the normal tile colors */
+  blendEndZoom: number;
+  /** Background color at z0 used under sparse landcover polygons */
+  backgroundAtZ0: string;
+  /** Low-zoom landcover colors */
+  landcover: {
+    wood: string;
+    grass: string;
+    scrub: string;
+    cropland: string;
+    farmland?: string;
+    rock?: string;
+    sand?: string;
+    wetland?: string;
+    default: string;
+  };
+  /** Low-zoom landuse colors */
+  landuse: {
+    park?: string;
+    cemetery?: string;
+    pitch?: string;
+    stadium?: string;
+    residential?: string;
+    college?: string;
+    commercial?: string;
+    construction?: string;
+    dam?: string;
+    farmland?: string;
+    grass?: string;
+    hospital?: string;
+    industrial?: string;
+    military?: string;
+    neighbourhood?: string;
+    quarry?: string;
+    quarter?: string;
+    railway?: string;
+    retail?: string;
+    school?: string;
+    suburb?: string;
+    theme_park?: string;
+    track?: string;
+    university?: string;
+    zoo?: string;
+    default: string;
+  };
+}
+
+// ============================================================================
 // COMPLETE THEME TYPE
 // ============================================================================
 
@@ -1079,4 +1136,6 @@ export interface Theme {
   starfield?: ThemeStarfield;
   /** Places configuration - optional, for incorporated places boundaries */
   places?: ThemePlaces;
+  /** Low-zoom land configuration for globe projection (z0–~5.5) */
+  worldLowZoomLand?: ThemeWorldLowZoomLand;
 }
